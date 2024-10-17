@@ -46,7 +46,7 @@ module LyricLab
             lyrics = Lrclib::LyricsMapper
                      .new
                      .search(song.title, song.artists.first.name)
-            view 'song', locals: { song:, lyrics: }
+            view 'song', locals: { song:song , lyrics:lyrics }
           end
         end
       end

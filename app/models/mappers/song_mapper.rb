@@ -29,11 +29,11 @@ module LyricLab
 
         def build_entity
           LyricLab::Entity::Song.new(
-            title:,
-            artists:,
-            popularity:,
-            album:,
-            preview_url:
+            title: title ,
+            artists: artists ,
+            popularity: popularity ,
+            album: album ,
+            preview_url: preview_url
           )
         end
 

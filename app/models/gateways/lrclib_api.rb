@@ -16,11 +16,11 @@ module LyricLab
 
         def get(track_name, artist_name)
           params = {
-            track_name:,
-            artist_name:
+            track_name: track_name ,
+            artist_name: artist_name
           }
 
-          http_response = HTTP.get(BASE_URL, params:)
+          http_response = HTTP.get(BASE_URL, params: params)
 
           Response.new(http_response).tap do |response|
             raise(response.error) unless response.successful?

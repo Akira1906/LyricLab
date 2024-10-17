@@ -17,10 +17,10 @@ module LyricLab
 
         def build_entity
           LyricLab::Entity::Album.new(
-            name:,
-            cover_image_url_big:,
-            cover_image_url_medium:,
-            cover_image_url_small:
+            name: name ,
+            cover_image_url_big:  cover_image_url_big ,
+            cover_image_url_medium:  cover_image_url_medium ,
+            cover_image_url_small: cover_image_url_small
           )
         end
 
