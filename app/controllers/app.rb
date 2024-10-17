@@ -18,8 +18,8 @@ module LyricLab
     plugin :halt
     plugin :flash
 
-    route do |r|
-      r.assets
+    route do |reject|
+      reject.assets
 
       # GET /
       r.root do
@@ -46,7 +46,7 @@ module LyricLab
             lyrics = Lrclib::LyricsMapper
                      .new
                      .search(song.title, song.artists.first.name)
-            view 'song', locals: { song:song , lyrics:lyrics }
+            view 'song', locals: { song: song_variable, lyrics: lyrics_variable }
           end
         end
       end

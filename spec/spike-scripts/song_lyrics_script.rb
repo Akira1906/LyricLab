@@ -6,14 +6,14 @@ require 'yaml'
 
 BASE_URL = 'https://lrclib.net/api/get'
 
-def call_api(song_title, artist_name)
+def call_api(_song_title, artist_name)
   url = BASE_URL.to_s
   params = {
-    :track_name => song_title, 
-    :artist_name => artist_name
+    track_name:,
+    artist_name:
   }
 
-  HTTP.get(url, :params => params)
+  HTTP.get(url, params: params)
 end
 
 def get_lyrics(received)
@@ -32,4 +32,3 @@ if response.code == 200
 else
   File.write('spec/fixtures/lyrics-failure-results.yml', get_lyrics(response).to_yaml)
 end
-

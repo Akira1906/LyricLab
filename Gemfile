@@ -29,3 +29,7 @@ gem 'webmock', '~> 3'
 gem 'flog'
 gem 'reek'
 gem 'rubocop'
+
+# running rubocop need
+source 'https://rubygems.org'
+gem 'panolint'

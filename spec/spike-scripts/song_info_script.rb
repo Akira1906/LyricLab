@@ -6,16 +6,13 @@ require 'json'
 
 def renew_token(config)
   url = 'https://accounts.spotify.com/api/token'
-  headers = {
-    'Content-Type' => 'application/x-www-form-urlencoded'
-  }
+  headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
   body = {
     grant_type: 'client_credentials',
     client_id: config['SPOTIFY_CLIENT_ID'],
     client_secret: config['SPOTIFY_CLIENT_SECRET']
   }
-  response = HTTP.headers(headers).post(url, form: body)
-  response.parse['access_token']
+  HTTP.headers(headers).post(url, form: body).parse['access_token']
 end
 
 def token_is_alive?(config)
@@ -70,9 +67,9 @@ spotify_results['album'] = song_info['album']['name']
 spotify_results['release_date'] = song_info['album']['release_date']
 spotify_results['duration'] = song_info['duration_ms']
 
-#add to return popularity,preview_url
-spotify_results['popularity'] = song_info['popularity'] 
-spotify_results['preview_url'] = song_info['preview_url'] 
+# add to return popularity,preview_url
+spotify_results['popularity'] = song_info['popularity']
+spotify_results['preview_url'] = song_info['preview_url']
 
 ## BAD request to Spotify API
 

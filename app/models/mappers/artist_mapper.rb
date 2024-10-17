@@ -16,7 +16,7 @@ module LyricLab
 
         def build_entity
           LyricLab::Entity::Artist.new(
-            name:  name ,
+            name:
           )
         end
 

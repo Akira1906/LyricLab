@@ -27,7 +27,7 @@ module LyricLab
 
         def build_entity
           LyricLab::Entity::Lyrics.new(
-            text: text ,
+            text:
           )
         end
 

@@ -15,3 +15,12 @@ Metrics/BlockLength:
   Enabled: true
   Exclude:
     - 'spec/**/*'
+
+# ignore vendor
+AllCops:
+  Exclude:
+    - 'vendor/**/*'
+
+# To use Ruby 1,9 hash syntax
+Style/HashSyntax:
+  EnforcedStyle: ruby19 
