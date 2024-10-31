@@ -49,3 +49,7 @@ group :development do
   gem 'rubocop-rake'
   gem 'ruby-lsp'
 end
+
+# for chatgpt
+gem 'rest-client'
+gem 'json'
