@@ -8,18 +8,7 @@ meta charset="UTF-8"
       .col-md-2.col-sm-3.text-center
         button#song-search-submit.btn.btn-success type="submit" search
 
-<<<<<<< HEAD
-    hr 
-  .row
-    - if recommendations.any?
-      .text-center.col-8
-        h2.mb-4 style="padding-top: 40px;" Top Songs
-        .table-responsive
-          table class="table table-hover" id="recommendations_table"
-            thead
-=======
     hr
-
   - if recommendations.any?
     .text-center
       h2.mb-4 style="padding-top: 40px;" Top Songs
@@ -30,13 +19,6 @@ meta charset="UTF-8"
               th
               th Title
               th Artist
-          tbody
-            - recommendations.each do |song|
->>>>>>> 89be27e08887d671fb739e2e500c1022603e85b6
-              tr
-                th
-                th Title
-                th Artist
             tbody
               - recommendations.each do |song|
                 tr

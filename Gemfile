@@ -53,7 +53,7 @@ end
 
 group :production do
   gem 'pg', '~> 1.2'
-endls
+end
 
 # Testing
 group :test do

@@ -51,7 +51,7 @@ module LyricLab
 
       def get_words_metadata(input_words) # rubocop:disable Metrics/AbcSize,Metrics/CyclomaticComplexity,Metrics/MethodLength
         message = [
-          { role: 'system', content: '現在你是一名繁體中文老師，要指導外國人學習中文，分析以下文字：' },
+          { role: 'system', content: '現在你是一名繁體中文老師，要指導外國人學習中文，分析以下文字`,每個difficulty至少有兩個詞彙並確保一樣的文字是一樣的difficulty分級，至少標註30個詞彙：' },
           { role: 'user', content: "Please identify these words and respond in this format:
             Word:[繁體中文字]
             translate:[English translation ONLY]
