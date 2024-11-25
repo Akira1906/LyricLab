@@ -1,10 +1,42 @@
-/ rich_text.slim
+.d-flex.justify-content-between.align-items-center.mb-3
+  div
+    h3.mb-0 Lyrics
+    span style="font-size: 0.8em; color: gray;" Click to see more vocabulary info.
+  .level-button-container
+    button#levelButton.btn.btn-outline-success.ms-auto onclick="toggleLevelDropdown(event)" Select vocabulary level
+    / TODO:default checkbox should filter by language skill
+    #levelDropdown.level-dropdown-content
+      .level-checkbox
+        input type="checkbox" id="beginnerCheck" checked=true
+        label.ms-2 for="beginnerCheck" Beginner
+      .level-checkbox
+        input type="checkbox" id="novice1Check" checked=true
+        label.ms-2 for="novice1Check" Novice 1
+      .level-checkbox
+        input type="checkbox" id="novice2Check" checked=true
+        label.ms-2 for="novice2Check" Novice 2
+      .level-checkbox
+        input type="checkbox" id="level1Check" checked=true
+        label.ms-2 for="level1Check" Level 1
+      .level-checkbox
+        input type="checkbox" id="level2Check" checked=true
+        label.ms-2 for="level2Check" Level 2
+      .level-checkbox
+        input type="checkbox" id="level3Check" checked=true
+        label.ms-2 for="level3Check" Level 3
+      .level-checkbox
+        input type="checkbox" id="level4Check" checked=true
+        label.ms-2 for="level4Check" Level 4
+      .level-checkbox
+        input type="checkbox" id="level5Check" checked=true
+        label.ms-2 for="level5Check" Level 5
+
 .lyrics.p-4 style="font-size: 1.2rem; line-height: 2;"
   - vocabulary.sep_text.split.each do |text_word|
     - unique_word = vocabulary.unique_words.find { |w| w.characters == text_word }
     - if unique_word
       span[
-        class="#{unique_word.language_level} cursor-pointer"
+        class="#{unique_word.language_level} cursor-pointer vocabulary-word"
         style="cursor: pointer;"
         onclick="handleWordClick(this)"
         data-word=unique_word.characters
@@ -18,7 +50,61 @@
       span = "#{text_word} "
 
 javascript:
+  function toggleLevelDropdown(event) {
+    if (!event) event = window.event;
+    event.stopPropagation();  
+    const dropdown = document.getElementById("levelDropdown");
+    dropdown.classList.toggle("show");
+  }
+
+
+  document.getElementById('levelDropdown').addEventListener('click', function(event) {
+    event.stopPropagation();
+  });
+
+  document.addEventListener('click', function(event) {
+    const dropdowns = document.getElementsByClassName("level-dropdown-content");
+    for (let dropdown of dropdowns) {
+      if (dropdown.classList.contains('show')) {
+        dropdown.classList.remove('show');
+      }
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkboxes = document.querySelectorAll('.level-checkbox input');
+    for (let checkbox of checkboxes) {
+      checkbox.addEventListener('change', function() {
+        const level = this.id.replace('Check', '');
+        const words = document.querySelectorAll('.vocabulary-word[data-level="' + level + '"]');
+        for (let word of words) {
+          if (this.checked) {
+            word.classList.remove('word-hidden');
+          } else {
+            word.classList.add('word-hidden');
+          }
+        }
+
+        const cards = document.querySelectorAll('.word-card');
+        for (let card of cards) {
+          const levelSpan = card.querySelector('span[class*="' + level + '-class"]');
+          if (levelSpan && !this.checked) {
+            card.remove();
+          }
+        }
+      });
+    }
+  });
+
   function handleWordClick(element) {
+    if (element.classList.contains('word-hidden')) return;
+
+    const level = element.dataset.level;
+    const checkbox = document.getElementById(`${level}Check`);
+    if (!checkbox || !checkbox.checked || element.classList.contains('word-hidden')) {
+      return;
+    } 
+
     const wordData = {
       word: element.dataset.word,
       translation: element.dataset.translation,
@@ -37,60 +123,60 @@ javascript:
     card.setAttribute('data-word', wordData.word);
     
     card.innerHTML = `
-      <div class="card-body">
-        <div class="d-flex justify-content-between align-items-start">
-          <div style="flex: 1;">
-            <h5 class="card-title mb-3">
-              <span class="${wordData.level}-class" style="font-size: 1.5rem;">
-                ${wordData.word}
-              </span>
-            </h5>
-            <div class="vocabulary-details">
-              <div class="mb-2">
-                <strong class="text-muted">pinyin：</strong>
-                <span class="card-subtitle">${wordData.pinyin}</span>
-              </div>
-              <div class="mb-2">
-                <strong class="text-muted">translation：</strong>
-                <span>${wordData.translation}</span>
-              </div>
-              <div class="mb-2">
-                <strong class="text-muted">definition：</strong>
-                <span>${wordData.definition || wordData.translation}</span>
-              </div>
-              <div class="mb-2">
-                <strong class="text-muted">example_sentence：</strong>
-                <span>${wordData.example}</span>
-              </div>
-              <div>
-                <strong class="text-muted">Level：</strong>
-                <span>${getLevelName(wordData.level)}</span>
-              </div>
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-start">
+        <div style="flex: 1;">
+          <h5 class="card-title mb-3">
+            <span class="${wordData.level}-class" style="font-size: 1.5rem;">
+              ${wordData.word}
+            </span>
+          </h5>
+          <div class="vocabulary-details" style="font-size: 0.9rem;">
+            <div class="mb-2 d-flex">
+              <strong class="text-muted" style="min-width: 100px;">Pinyin:</strong>
+              <span style="flex: 1;">${wordData.pinyin}</span>
+            </div>
+            <div class="mb-2 d-flex">
+              <strong class="text-muted" style="min-width: 100px;">Translation:</strong>
+              <span style="flex: 1;">${wordData.translation}</span>
+            </div>
+            <div class="mb-2 d-flex">
+              <strong class="text-muted" style="min-width: 100px;">Definition:</strong>
+              <span style="flex: 1;">${wordData.definition || wordData.translation}</span>
+            </div>
+            <div class="mb-2 d-flex flex-column">
+              <strong class="text-muted" style="min-width: 200px;">Example_sentence:</strong>
+              <span style="flex: 1;">${wordData.example}</span>
+            </div>
+            <div class="d-flex">
+              <strong class="text-muted" style="min-width: 100px;">Level:</strong>
+              <span style="flex: 1;">${getLevelName(wordData.level)}</span>
             </div>
           </div>
-          <button class="btn text-dark" style="padding: 0 8px; font-size: 1.5rem; line-height: 1;" onclick="removeWord(this)">×</button>
         </div>
+        <button class="btn text-dark" style="padding: 0 10px; font-size: 1.5rem; line-height: 1;" onclick="removeWord(this)">×</button>
       </div>
-    `;
+    </div>
+  `;
     
     const vocabularyDetails = document.getElementById('vocabulary-details');
     vocabularyDetails.insertBefore(card, vocabularyDetails.firstChild);
   }
-  
+ 
   function removeWord(button) {
     button.closest('.word-card').remove();
   }
   
   function getLevelName(level) {
     const levelMap = {
-      'beginner': 'Basic',
-      'novice1': 'Basic',
-      'novice2': 'Basic',
-      'level1': 'Intermediate',
-      'level2': 'Intermediate',
-      'level3': 'Intermediate',
-      'level4': 'Advance',
-      'level5': 'Advance'
+      'beginner': 'Beginner',
+      'novice1': 'Novice1',
+      'novice2': 'Novice2',
+      'level1': 'Level1',
+      'level2': 'Level2',
+      'level3': 'Level3',
+      'level4': 'Level4',
+      'level5': 'Level5'
     };
     return levelMap[level] || level;
   }

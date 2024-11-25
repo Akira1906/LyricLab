@@ -112,37 +112,66 @@ audio {
 }
 
 /* Vocabulary Styles beginner novice1 novice2 level1 level2 level3 level4 level5*/
-span.beginner-class,
-span.novice1-class,
+span.beginner-class {
+  color: #43aa8b;
+}
+
+span.novice1-class {
+  color: #90be6d;
+}
+
 span.novice2-class {
-  color: #15a837; /* Basic green */
+  color: #f9c74f;
 }
 
-span.level1-class,
-span.level2-class,
+span.level1-class {
+  color: #f9844a;
+}
+span.level2-class {
+  color: #f8961e;
+}
+
 span.level3-class {
-  color: #d8780b; /* Intermediate orange */
+  color: #f3722c;
 }
 
-span.level4-class,
+span.level4-class {
+  color: #f94144;
+}
+
 span.level5-class {
-  color: #9b2518; /* Advanced red */
+  color: #9b2518;
 }
 
-.card-title .beginner-class,
-.card-title .novice1-class,
-.card-title .novice2-class {
-  color: #15a837;
+.card-title.beginner-class {
+  color: #43aa8b;
 }
 
-.card-title .level1-class,
-.card-title .level2-class,
-.card-title .level3-class {
-  color: #d8780b;
+.card-title.novice1-class {
+  color: #90be6d;
 }
 
-.card-title .level4-class,
-.card-title .level5-class {
+.card-title.novice2-class {
+  color: #f9c74f;
+}
+
+.card-title.level1-class {
+  color: #f9844a;
+}
+
+.card-title.level2-class {
+  color: #f8961e;
+}
+
+.card-title.level3-class {
+  color: #f3722c;
+}
+
+.card-title.level4-class {
+  color: #f94144;
+}
+
+.card-title.level5-class {
   color: #9b2518;
 }
 
@@ -160,6 +189,7 @@ span.level5-class {
   background: none;
   cursor: pointer;
   font-size: 1.25rem;
+  z-index: 1000;
 }
 
 .sticky-top {
@@ -225,4 +255,68 @@ span.level5-class {
 
 .song-info p {
   margin-bottom: 1rem;
+}
+
+.lyrics {
+  white-space: pre-line;
+}
+
+.lyric-line {
+  margin-bottom: 0.5rem;
+}
+
+.lyric-line span {
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.lyric-line span:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-radius: 2px;
+}
+
+.cover-container {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* language level dropdown*/
+.level-button-container {
+  position: relative;
+  display: inline-block;
+  z-index: 9999;
+}
+
+.level-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.level-dropdown-content {
+  position: absolute;
+  left: calc(100% + 5px);
+  top: 0;
+  background-color: white;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  padding: 10px;
+  border-radius: 4px;
+  display: none;
+}
+
+.level-checkbox {
+  display: block;
+  margin: 5px 0;
+  white-space: nowrap;
+}
+
+.word-hidden {
+  color: #999 !important;
+  cursor: default !important;
+}
+
+.show {
+  display: block !important;
 }

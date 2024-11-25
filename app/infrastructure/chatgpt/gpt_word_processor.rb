@@ -38,7 +38,7 @@ module LyricLab
       def extract_separated_text(text)
         # should return a list of unique words extracted by ChatGPT
         extract_message = [
-          { role: 'system', content: '你是一個專業的繁體中文老師，可以從文本中提取有意義的繁體中文詞彙單位' },
+          { role: 'system', content: '你是一個專業的繁體中文老師，可以從文本中提取有意義的繁體中文詞彙單位，務必確認文本中的每一個字都有被歸在一個詞彙單位' },
           { role: 'user', content: "Separate all the words in the following text from each other and:
         reply in this format (words separated by spaces):
         你好 風 雲 天空 I am cool
@@ -61,7 +61,7 @@ module LyricLab
             Word type:[選擇詞性：N,V,Adj,Adv,Pron,Prep,Conj,Num,Int,Classifier,Idiom,Other]
             Example:[實用的20字內繁體中文例句]
 
-            Focus on words that would be valuable for language learners. Keep example sentences natural and practical.
+            確保文本中的每一個詞彙都有被解析到.
 
             Words: #{input_words}" }
         ]
