@@ -1,6 +1,4 @@
-meta charset="UTF-8"
 .container
-
   form#search-song-form role="form" action="/search" method="POST"
     .row.justify-content-center.align-items-center.my-4
       .col-md-8.col-sm-6
@@ -8,43 +6,94 @@ meta charset="UTF-8"
       .col-md-2.col-sm-3.text-center
         button#song-search-submit.btn.btn-success type="submit" search
 
-    hr
-  - if recommendations.any?
-    .text-center
-      h2.mb-4 style="padding-top: 40px;" Top Songs
-      .table-responsive
-        table class="table table-hover" id="recommendations_table"
-          thead
-            tr
-              th
-              th Title
-              th Artist
-            tbody
-              - recommendations.each do |song|
-                tr
-                  td 
-                    a href=song.result_link
-                      button.recommendation-button
-                        i class="fa-regular fa-eye"
-                  td.font-weight-bold= song.title
-                  td.font-weight-bold= song.artist
+        / TODO: after adding popup logic should remove
+        button.btn.btn-primary type="button" data-bs-toggle="modal" data-bs-target="#welcome-modal"
+        | Test Modal
 
-    - if song_history.any?
-      .text-center.col-4
-        h3.mb-4 style="padding-top: 40px;" You previously looked at these songs
-        .table-responsive
-          table class="table table-hover" id="song_history_table"
-            thead
-              tr
-                th
-                th Title
-                th Artist
-            tbody
-              - song_history.each do |song|
-                tr
-                  td 
-                    a href=song.result_link
-                      button.recommendation-button
-                        i class="fa-regular fa-eye"
-                  td.font-weight-bold= song.title
-                  td.font-weight-bold= song.artist
+    hr.mb-4
+  - if recommendations.any?
+    .row
+      .col-md-8
+        .text-center
+          h2.mb-4 Top Songs
+        .d-flex
+          .nav.nav-pills.flex-column.me-3 style="min-width: 100px; "
+            .nav-item
+              a.nav-link.active.success.py-1 data-toggle="tab" href="#beginner" Beginner
+            .nav-item
+              a.nav-link.warning.py-1 data-toggle="tab" href="#intermediate" Intermediate
+            .nav-item
+              a.nav-link.warning.py-1 data-toggle="tab" href="#advanced" Advanced
+            .nav-item
+              a.nav-link.danger.py-1 data-toggle="tab" href="#expert" Expert
+            .nav-item
+              a.nav-link.danger.py-1 data-toggle="tab" href="#master" Master
+                
+
+          .tab-content.ms-0.flex-grow-1
+            .tab-pane.fade.show.active#overall
+              .table-responsive style="min-height: 300px;"
+                table class="table table-hover" id="recommendations_table"
+                  thead
+                    tr
+                      th style="width: 50px;padding-left: 3rem;"
+                      th style="width :80px;"Title
+                      th style="width :80px;"Artist
+                  tbody
+                    - row_count = 0
+                    - recommendations.each do |song|
+                      tr
+                        td style="padding-left: 1rem;"
+                          a href=song.result_link
+                            button.recommendation-button
+                              i class="fa-regular fa-eye"
+                        td.font-weight-bold = song.title
+                        td.font-weight-bold = song.artist
+                     
+
+            / TODO:add language skill logic
+            / Beginner（1-3）
+            / Intermediate（2-4）
+            / Advanced（3-5）
+            / Expert（4-6）
+            / Master（5-7）
+            .tab-pane.fade#listening
+              .table-responsive style="min-height: 300px;"
+                table class="table table-hover" id="listening_recommendations"
+              
+
+            .tab-pane.fade#speaking
+              .table-responsive style="min-height: 300px;"
+                table class="table table-hover" id="speaking_recommendations"
+              
+
+            .tab-pane.fade#reading
+              .table-responsive style="min-height: 300px;"
+                table class="table table-hover" id="reading_recommendations"
+  
+
+            .tab-pane.fade#writing
+              .table-responsive style="min-height: 300px;"
+                table class="table table-hover" id="writing_recommendations"
+
+
+      - if song_history.any?
+        .col-md-4
+          .text-center
+            h2.mb-4 History
+            .table-responsive style="min-height: 300px;"
+              table class="table table-hover" id="song_history_table"
+                thead
+                  tr
+                    th style="width: 50px;"
+                    th Title
+                    th Artist
+                tbody
+                  - song_history.each do |song|
+                    tr
+                      td 
+                        a href=song.result_link
+                          button.recommendation-button
+                            i class="fa-regular fa-eye"
+                      td.font-weight-bold= song.title
+                      td.font-weight-bold= song.artist
