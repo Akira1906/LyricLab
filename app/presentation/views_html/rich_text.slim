@@ -1,7 +1,12 @@
 .d-flex.justify-content-between.align-items-center.mb-3
   div
     h3.mb-0 Lyrics
-    span style="font-size: 0.8em; color: gray;" Click to see more vocabulary info.
+    span click to see more vocabulary info.
+
+    a.btn.d-inline-flex.align-items-center href="https://open.spotify.com/" target="_blank" style="background-color: #1DB954; color: white; border-radius: 500px; padding: 7px 15px; font-size: 14px; text-decoration: none; transition: all 0.2s ease;"
+      i.fab.fa-spotify style="font-size: 16px; margin-right: 6px;"
+      span Listen on Spotify
+
   .level-button-container
     button#levelButton.btn.btn-outline-success.ms-auto onclick="toggleLevelDropdown(event)" Select vocabulary level
     / TODO:default checkbox should filter by language skill
