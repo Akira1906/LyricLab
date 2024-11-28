@@ -18,7 +18,7 @@ module LyricLab
       include Roar::Decorator::HypermediaConsumer
 
       property :title
-      property :spotify_id
+      property :origin_id
       property :popularity
       property :preview_url
       property :album_name
@@ -27,23 +27,22 @@ module LyricLab
       property :cover_image_url_medium
       property :cover_image_url_small
       property :is_instrumental
-      property :explicit
 
-      property :vocabulary, extend: Representer::Vocabulary, class: OpenStruct
-      property :lyrics, extend: Representer::Lyrics, class: OpenStruct
+      property :vocabulary, extend: Representer::Vocabulary, class: OpenStruct # rubocop:disable Style/OpenStructUse
+      property :lyrics, extend: Representer::Lyrics, class: OpenStruct # rubocop:disable Style/OpenStructUse
 
       link :self do
-        "#{App.config.API_HOST}/api/v1/songs/#{sp_id}"
+        "#{App.config.API_HOST}/api/v1/songs/#{or_id}"
       end
 
       link :get_vocabulary do
-        "#{App.config.API_HOST}/api/v1/vocabularies/#{sp_id}"
+        "#{App.config.API_HOST}/api/v1/vocabularies/#{or_id}"
       end
 
       private
 
-      def sp_id
-        represented.spotify_id
+      def or_id
+        represented.origin_id
       end
     end
   end

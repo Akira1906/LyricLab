@@ -17,7 +17,7 @@ module LyricLab
       property :title
       property :artist_name_string
       property :search_cnt
-      property :spotify_id
+      property :origin_id
     end
   end
 end

@@ -12,10 +12,17 @@ module LyricLab
     class Lyrics < Roar::Decorator
       include Roar::JSON
 
-      property :id
       property :text
       property :is_mandarin
-      property :is_instrumental
+      property :is_explicit
+
+      def mandarin?
+        represented.is_mandarin
+      end
+
+      def explicit?
+        represented.is_explicit
+      end
     end
   end
 end

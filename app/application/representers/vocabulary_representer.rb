@@ -16,10 +16,9 @@ module LyricLab
       include Roar::Hypermedia
       include Roar::Decorator::HypermediaConsumer
 
-      property :unique_words
       property :sep_text
-      # collection :unique_words, extend: Representer::Word, class: OpenStruct
-      # property :unique_words, extend: Representer::Word, class: OpenStruct
+      property :language_difficulty
+      collection :unique_words, extend: Representer::Word, class: OpenStruct # rubocop:disable Style/OpenStructUse
     end
   end
 end
