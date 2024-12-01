@@ -5,7 +5,6 @@ ruby File.read('.ruby-version').strip
 
 # Configuration and Utilities
 gem 'figaro', '~> 1.2'
-gem 'ostruct'
 gem 'pry'
 gem 'rake'
 
@@ -22,6 +21,10 @@ gem 'logger', '~> 1.6'
 gem 'puma', '~> 6.0'
 gem 'rack-session', '~> 0.3'
 gem 'roda', '~> 3.0'
+gem 'multi_json', '~> 1.15'
+gem 'ostruct', '~> 0.0'
+gem 'roar', '~> 1.0'
+gem 'rack-cache'
 
 # Controllers and services
 gem 'dry-monads', '~> 1.4'

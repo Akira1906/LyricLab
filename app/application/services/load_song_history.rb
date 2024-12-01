@@ -8,44 +8,28 @@ module LyricLab
     class LoadSongHistory
       include Dry::Transaction
 
-      step :load_songs_from_database
-      step :create_song_view_objects
+      step :get_songs
+      step :reify_songs
 
-      private
+      def get_songs(ids)
+        result = Gateway::Api.new(LyricLab::App.config)
+          .load_songs(ids.join('-'))
 
-      def load_songs_from_database(input)
-        puts input.length
-        if input.empty?
-          Failure('no sessions')
-        else
-          songs = input.map! do |spotify_id|
-              load_song_from_database(spotify_id)
-          end
-          Success(songs)
-        end
-
-        #songs = input.map! do |spotify_id|
-        #  load_song_from_database(spotify_id)
-        #end
-        #Success(songs)
+        result.success? ? Success(result.payload) : Failure(result.message)
       rescue StandardError => e
-        App.logger.error e.backtrace.join("\n")
-        Failure(e.to_s)
+        puts e.inspect
+        puts e.backtrace
+        Failure('Cannot find songs right now; please try again later')
       end
 
-      def create_song_view_objects(input)
-        view_songs = input.map do |song|
-          Views::Song.new(song)
-        end
-        Success(view_songs)
-      rescue StandardError => e
-        App.logger.error e.backtrace.join("\n")
-        Failure(e.to_s)
-      end
-
-      def load_song_from_database(spotify_id)
-        Repository::For.klass(Entity::Song).find_spotify_id(spotify_id)
+      def reify_recommendations(songs_json)
+        Representer::SearchResults.new(OpenStruct.new)
+          .from_json(songs_json)
+          .then { |songs| Success(songs) }
+      rescue StandardError
+        Failure('Error in the Load Songs -- please try again')
       end
     end
   end
 end
+

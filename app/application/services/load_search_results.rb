@@ -1,20 +1,33 @@
 # frozen_string_literal: true
 
-require 'dry/monads'
+require 'dry/transaction'
 
 module LyricLab
   module Service
     # Retrieves array of all listed project entities
     class LoadSearchResults
-      include Dry::Monads::Result::Mixin
+      include Dry::Transaction
 
-      def call(ids)
-        search_results = ids.map do |id|
-          Repository::For.klass(Entity::Song).find_spotify_id(id)
-        end
-        Success(search_results)
+      step :get_songs
+      step :reify_songs
+
+      def get_songs(ids)
+        result = Gateway::Api.new(LyricLab::App.config)
+          .load_songs(ids.join('-'))
+
+        result.success? ? Success(result.payload) : Failure(result.message)
+      rescue StandardError => e
+        puts e.inspect
+        puts e.backtrace
+        Failure('Cannot find songs right now; please try again later')
+      end
+
+      def reify_songs(songs_json)
+        Representer::SearchResults.new(OpenStruct.new)
+          .from_json(songs_json)
+          .then { |songs| Success(songs) }
       rescue StandardError
-        Failure('could not access database')
+        Failure('Error in the Load Songs -- please try again')
       end
     end
   end

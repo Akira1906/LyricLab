@@ -24,7 +24,7 @@ module Views
     end
 
     def id
-      @recommendation.spotify_id
+      @recommendation.origin_id
     end
   end
 end

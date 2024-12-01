@@ -16,11 +16,11 @@ module Views
     end
 
     def result_link
-      "/search/result/#{spotify_id}"
+      "/search/result/#{origin_id}"
     end
 
-    def spotify_id
-      @song.spotify_id
+    def origin_id
+      @song.origin_id
     end
 
     def artist

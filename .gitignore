@@ -4,3 +4,4 @@ coverage/*
 !coverage/.resultset.json
 vendor/*
 *.db
+_cache/

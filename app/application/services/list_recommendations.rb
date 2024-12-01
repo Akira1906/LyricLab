@@ -1,18 +1,34 @@
 # frozen_string_literal: true
 
-require 'dry/monads'
+require 'dry/transaction'
 
 module LyricLab
   module Service
     # Retrieves array of all listed project entities
     class ListRecommendations
-      include Dry::Monads::Result::Mixin
+      include Dry::Transaction
 
-      def call
-        recommendations = Repository::For.klass(Entity::Recommendation).top_searched_songs
-        Success(recommendations)
+      step :get_recommendations
+      step :reify_recommendations
+
+      def get_recommendations
+        result = Gateway::Api.new(LyricLab::App.config)
+          .list_recommendations()
+
+        result.success? ? Success(result.payload) : Failure(result.message)
+      rescue StandardError => e
+        puts e.inspect
+        puts e.backtrace
+        Failure('Cannot find recommendations right now; please try again later')
+      end
+
+      def reify_recommendations(recommendations_json)
+        puts recommendations_json
+        Representer::RecommendationsList.new(OpenStruct.new)
+          .from_json(recommendations_json)
+          .then { |songs| Success(songs) }
       rescue StandardError
-        Failure('could not access database')
+        Failure('Error in the Search Results -- please try again')
       end
     end
   end

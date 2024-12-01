@@ -6,6 +6,7 @@ require 'figaro'
 require 'sequel'
 require 'rack/session'
 require 'logger'
+require 'rack-cache'
 
 module LyricLab
   # Environment specific configuration
@@ -25,6 +26,13 @@ module LyricLab
     configure :development, :test do
       require 'pry'; # for breakpoints
       ENV['DATABASE_URL'] = "sqlite://#{config.DB_FILENAME}"
+    end
+
+    configure :development do
+      use Rack::Cache,
+      verbose: true,
+      metastore: 'file:_cache/rack/meta',
+      entitystore: 'file:_cache/rack/body'
     end
 
     # Database Setup

@@ -11,30 +11,27 @@ module LyricLab
       GPT_API_KEY = LyricLab::App.config.GPT_API_KEY
 
       step :populate_vocabulary
-      step :store_vocabulary
+      step :reify_vocabulary
 
       private
 
-      def populate_vocabulary(input_song)
-        if input_song.vocabulary.unique_words.empty?
-          input_song.vocabulary.gen_unique_words(input_song.lyrics.text, GPT_API_KEY)
-        end
-        Success(input_song)
+      def populate_vocabulary(origin_id)
+        result = Gateway::Api.new(LyricLab::App.config)
+          .load_vocabulary(origin_id)
+
+        result.success? ? Success(result.payload) : Failure(result.message)
       rescue StandardError => e
-        App.logger.error e.backtrace.join("\n")
-        Failure(e.to_s)
+        puts e.inspect
+        puts e.backtrace
+        Failure('Cannot create vocabularies right now; please try again later')
       end
 
-      def store_vocabulary(input)
-        if Repository::For.entity(input).find(input)
-          Repository::For.entity(input).update(input)
-        else
-          Repository::For.entity(input).create(input)
-        end
-        Success(input)
-      rescue StandardError => e
-        App.logger.error e.backtrace.join("\n")
-        Failure(e.to_s)
+      def reify_vocabulary(songs_json)
+        Representer::Song.new(OpenStruct.new)
+          .from_json(songs_json)
+          .then { |songs| Success(songs) }
+      rescue StandardError
+        Failure('Error in the Song -- please try again')
       end
     end
   end
