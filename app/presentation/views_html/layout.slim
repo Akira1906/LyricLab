@@ -2,8 +2,10 @@ doctype html
 html
   head
     title LyricLab
+    meta charset="UTF-8"
     link rel="icon" href="/assets/favicon.ico" type="image/x-icon"
     
+   
     link{
       href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.3/dist/minty/bootstrap.min.css"
       rel="stylesheet"
@@ -11,16 +13,18 @@ html
     }
     
     == assets(:css)
-     link rel="stylesheet" href="/assets/style.css"
+    link rel="stylesheet" href="/assets/style.css"
 
   body
+    
     script{
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
       crossorigin="anonymous"
     }
 
+    
     script{
-      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
       crossorigin="anonymous"
     }
 
@@ -29,8 +33,6 @@ html
       src="https://kit.fontawesome.com/06d707e7db.js" 
       crossorigin="anonymous"
     }
-
-    meta charset="UTF-8"
 
     .container id='html_body'
       section
@@ -41,10 +43,31 @@ html
 
       section
         include :flash_bar
-        == yield  
+        == yield
+
+    / Welcome 
+    #welcome-modal.modal.fade tabindex="-1" role="dialog" aria-labelledby="welcomeModalLabel" aria-hidden="true"
+      .modal-dialog.modal-dialog-centered role="document"
+        .modal-content
+          .modal-header.border-0.pb-0
+            h5#welcomeModalLabel.modal-title.fw-bold Welcome to LyricLab!
+            button.btn-close type="button" data-bs-dismiss="modal" aria-label="Close"
+              span aria-hidden="true" &times;
+
+          .modal-body
+            p.mb-4 Please select your Chinese proficiency level to get started.
+            .form-group
+              / label.form-label.mb-2 for="proficiency-level" Proficiency Level
+              select#proficiency-level.form-select
+                option value="" selected="selected" disabled=true Choose your level...
+                option value="beginner" Beginner
+                option value="intermediate" Intermediate
+                option value="advanced" Advanced
+                option value="expert" Expert
+                option value="master" Master
+
+          .modal-footer
+            button#start-learning.btn.btn-success.px-4 type="button" Let's start learning
 
     footer.mt-5.text-center
       p ="Made for non-commercial purposes"
-
-
-  
