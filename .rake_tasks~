@@ -1,0 +1,10 @@
+console
+new_session_secret
+quality:all
+quality:flog
+quality:reek
+quality:rubocop
+run
+run:dev
+run:test
+spec_accept
