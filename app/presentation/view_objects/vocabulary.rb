@@ -14,13 +14,29 @@ module Views
       @vocabulary.sep_text
     end
 
+    def raw_text
+      @vocabulary.raw_text
+    end
+
     def unique_words
       @vocabulary.unique_words.map { |word| Views::Word.new(word) }
     end
 
+    def origin_id
+      @vocabulary.origin_id
+    end
+
+    def song
+      @vocabulary.song
+    end
+
     def rich_text
       Slim::Template.new('app/presentation/views_html/rich_text.slim')
-      .render(Object.new, vocabulary: self)
+      .render(self, vocabulary: self, song: @song)
+    end
+
+    def entity
+      @vocabulary
     end
   end
 end

@@ -3,9 +3,11 @@
     h3.mb-0 Lyrics
     span click to see more vocabulary info.
 
-    a.btn.d-inline-flex.align-items-center href="https://open.spotify.com/" target="_blank" style="background-color: #1DB954; color: white; border-radius: 500px; padding: 7px 15px; font-size: 14px; text-decoration: none; transition: all 0.2s ease;"
-      i.fab.fa-spotify style="font-size: 16px; margin-right: 6px;"
-      span Listen on Spotify
+    - if vocabulary.respond_to?(:song) && vocabulary.song&.respond_to?(:origin_id)
+      - spotify_url = "https://open.spotify.com/track/#{vocabulary.song.origin_id}"
+      a.btn.d-inline-flex.align-items-center href=spotify_url target="_blank" style="background-color: #1DB954; color: white; border-radius: 500px; padding: 7px 15px; font-size: 14px; text-decoration: none; transition: all 0.2s ease;"
+        i.fab.fa-spotify style="font-size: 16px; margin-right: 6px;"
+        span Listen on Spotify
 
   .level-button-container
     button#levelButton.btn.btn-outline-success.ms-auto onclick="toggleLevelDropdown(event)" Select vocabulary level
@@ -36,23 +38,29 @@
         input type="checkbox" id="level5Check" checked=true
         label.ms-2 for="level5Check" Level 5
 
-.lyrics.p-4 style="font-size: 1.2rem; line-height: 2;"
-  - vocabulary.sep_text.split.each do |text_word|
-    - unique_word = vocabulary.unique_words.find { |w| w.characters == text_word }
-    - if unique_word
-      span[
-        class="#{unique_word.language_level} cursor-pointer vocabulary-word"
-        style="cursor: pointer;"
-        onclick="handleWordClick(this)"
-        data-word=unique_word.characters
-        data-translation=unique_word.translation
-        data-pinyin=unique_word.pinyin
-        data-definition=unique_word.definition
-        data-example=unique_word.example_sentence
-        data-level=unique_word.language_level.gsub('-class', '')
-      ] = "#{text_word} "
-    - else
-      span = "#{text_word} "
+.lyrics.p-4 style="font-size: 1.2rem;"
+  - if vocabulary.respond_to?(:raw_text) && vocabulary.raw_text
+    - lines = vocabulary.raw_text.split("\n")
+    - lines.each do |line|
+      .line.mb-3 style="letter-spacing: -1px; line-height: 1.1;"
+        - line.split.each do |text_word|
+          - unique_word = vocabulary.unique_words.find { |w| w.characters == text_word }
+          - if unique_word
+            span[
+              class="#{unique_word.language_level} cursor-pointer vocabulary-word"
+              style="cursor: pointer;"
+              onclick="handleWordClick(this)"
+              data-word=unique_word.characters
+              data-translation=unique_word.translation
+              data-pinyin=unique_word.pinyin
+              data-definition=unique_word.definition
+              data-example=unique_word.example_sentence
+              data-level=unique_word.language_level.gsub('-class', '')
+            ] = "#{text_word} "
+            span.word-space<> = " "
+          - else
+            span = text_word
+            span.word-space<> = " "
 
 javascript:
   function toggleLevelDropdown(event) {
