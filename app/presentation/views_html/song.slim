@@ -1,6 +1,14 @@
 .container-fluid.py-4
   .card.border-0.shadow-sm.mb-4
     .card-body.p-5
+      / Debug information
+      / .debug-info.small.text-muted.mb-3
+      /   | Preview URL: #{song.preview_url.inspect}
+      /   br
+      /   | Preview URL defined?: #{defined?(song.preview_url)}
+      /   br
+      /   | Song methods: #{song.methods.include?(:preview_url)}
+
       .row.justify-content-center
         .col-lg-10
           .d-flex.flex-wrap.align-items-start.justify-content-center.gap-5
@@ -8,11 +16,15 @@
             div style="width: 350px;"
               .cover-container.mb-3
                 img.img-fluid.rounded-3.w-100 src="#{song.cover_image_url_medium}" alt="Album Cover" style="object-fit: cover;"
-              - if song.preview_url
-                .audio-container
-                  audio.w-100 controls=true
-                    source src="#{song.preview_url}" type="audio/mpeg"
-            
+              / - if song.respond_to?(:preview_url) && !song.preview_url.nil?
+              /   p.text-success Preview URL is available
+              /   .audio-container.mb-3
+              /     audio.w-100 controls=true
+              /       source src="#{song.preview_url}" type="audio/mpeg"
+              / - else
+              /   p.text-danger 
+              /     | Preview URL not available 
+              /     = "(respond_to?: #{song.respond_to?(:preview_url)})"              
             
             .song-info-container.pt-2 style="width: 350px;"
               h2.display-4.mb-3
@@ -27,8 +39,25 @@
                   div
                     .text-uppercase.text-muted.small.mb-1 Popularity
                     .h5.mb-0.d-flex.align-items-center
-                      i.fas.fa-star.text-warning.me-2
+                      i.fas.fa-fire.text-warning.me-2
                       = song.popularity
+
+                div.mb-3
+                  .text-uppercase.text-muted.small.mb-1 Language Level
+                  .h5.mb-0.d-flex.align-items-center
+                    / TODO: add language level show up icon
+                    - level = 3  
+                    - 5.times do |i|
+                      - if i < level
+                        i.fas.fa-star.text-warning.me-1
+                      - else
+                        i.fas.fa-star.text-gray-300.me-1
+
+                div.mt-3
+                  - if song.origin_id
+                    a.btn.d-inline-flex.align-items-center.w-100.justify-content-center href="https://open.spotify.com/track/#{song.origin_id}" target="_blank" style="background-color: #1DB954; color: white; border-radius: 500px; padding: 7px 15px; font-size: 14px; text-decoration: none; transition: all 0.2s ease;"
+                      i.fab.fa-spotify style="font-size: 16px; margin-right: 6px;"
+                      span Listen on Spotify
 
   .row
     .col-md-7

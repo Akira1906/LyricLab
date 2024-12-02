@@ -99,6 +99,10 @@ audio {
   border: 1px solid #e0e0e0;
 }
 
+.word-space {
+  margin: 0 2px;
+}
+
 /* Button Styles */
 .btn-outline-primary {
   color: #3498db;
@@ -279,6 +283,10 @@ span.level5-class {
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.text-gray-300 {
+  color: #cbd5e0;
 }
 
 /* language level dropdown*/
