@@ -1,0 +1,23 @@
+#welcome-modal.modal.fade tabindex="-1" role="dialog" aria-labelledby="welcomeModalLabel" aria-hidden="true"
+  .modal-dialog.modal-dialog-centered role="document"
+    .modal-content.p-4
+      .modal-header.border-0.pb-0
+        h4#welcomeModalLabel.modal-title.fw-bold Welcome to LyricLab!
+        button.btn-close type="button" data-bs-dismiss="modal" aria-label="Close"
+
+      .modal-body.pt-4
+        p.text-muted.mb-4 style="font-size: 1.1rem;" Please select your Mandarin level to get started.
+        .form-group
+          label.form-label.mb-3 for="proficiency-level" 
+            span.fw-medium style="font-size: 1.1rem;" Proficiency Level
+          select#proficiency-level.form-select.form-select-lg.mb-4
+            option value="" selected="selected" disabled=true Choose your level...
+            option value="beginner" Beginner
+            option value="intermediate" Intermediate
+            option value="advanced" Advanced
+            option value="expert" Expert
+            option value="master" Master
+
+      .modal-footer.border-0.pt-2
+        button#start-learning.btn.btn-success.btn-lg.px-5.py-2 style="border-radius: 50px;" type="button"
+          | Let's start learning

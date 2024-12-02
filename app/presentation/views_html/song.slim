@@ -1,34 +1,40 @@
-/ song.slim
-.container-fluid
+.container-fluid.py-4
+  .card.border-0.shadow-sm.mb-4
+    .card-body.p-5
+      .row.justify-content-center
+        .col-lg-10
+          .d-flex.flex-wrap.align-items-start.justify-content-center.gap-5
+          
+            div style="width: 350px;"
+              .cover-container.mb-3
+                img.img-fluid.rounded-3.w-100 src="#{song.cover_image_url_medium}" alt="Album Cover" style="object-fit: cover;"
+              - if song.preview_url
+                .audio-container
+                  audio.w-100 controls=true
+                    source src="#{song.preview_url}" type="audio/mpeg"
+            
+            
+            .song-info-container.pt-2 style="width: 350px;"
+              h2.display-4.mb-3
+                = song.title
+              h3.text-muted.mb-4 style="font-size: 1.75rem; font-weight: 400;"
+                = song.artist_name_string
+              .song-details
+                .d-flex.align-items-center.mb-3
+                  .me-5
+                    .text-uppercase.text-muted.small.mb-1 Album
+                    .h5.mb-0 = song.album_name
+                  div
+                    .text-uppercase.text-muted.small.mb-1 Popularity
+                    .h5.mb-0.d-flex.align-items-center
+                      i.fas.fa-star.text-warning.me-2
+                      = song.popularity
 
-  / 歌曲基本信息
-  .card.mb-4
-    .card-body
-      .row.align-items-center
-        .col-md-4
-          img.img-fluid.mb-3 src=song.cover_image_url_medium alt="Album Cover"
-          - if song.preview_url
-            audio.w-100.mb-3 controls=""
-              source src=song.preview_url type="audio/mpeg"
-        
-        .col-md-8
-          h2.card-title.mb-4 style="font-size: 2.5rem;" = song.title
-          h3.card-subtitle.mb-4.text-muted style="font-size: 2rem;" = song.artist_name_string
-          .song-info style="font-size: 1.5rem;"
-            p.mb-3
-              strong.me-2 Album:
-              span = song.album_name
-            p
-              strong.me-2 Popularity in Spotify:
-              span = song.popularity
-
-  / 歌詞區域
   .row
     .col-md-7
-      .card
-        .card-body
-          h3.mb-4 Lyrics
+      .card.border-0.shadow-sm
+        .card-body.p-4
           == song.vocabulary.rich_text
     
     .col-md-5
-      #vocabulary-details.sticky-top style="top: 20px; max-height: 80vh; overflow-y: auto;"
+      #vocabulary-details.sticky-top style="top: 20px; max-height: calc(100vh - 40px); overflow-y: auto;"
