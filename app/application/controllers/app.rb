@@ -51,7 +51,7 @@ module LyricLab
         result = Service::ListRecommendations.new.call
         viewable_recommendations = []
         if result.failure?
-          flash.now[:warning] = MSG_NO_RECOMMENDATIONS
+          flash.now[:error] = MSG_NO_RECOMMENDATIONS
         else
           recommendations = result.value!.recommendations
           flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if recommendations.none?
@@ -73,12 +73,13 @@ module LyricLab
           routing.post do
             search_string = Forms::NewSearch.new.call(routing.params)
             search_results = Service::FindSongsFromSearch.new.call(search_string)
-
+            puts "search_results: #{search_results.inspect}"
             raise search_results.failure if search_results.failure?
 
             songs = search_results.value!.songs
             session[:search_result_ids] = songs.map(&:origin_id)
-            routing.redirect "search/search_results/?i=#{songs.map(&:origin_id).join('-')}"
+            puts "search/results/?i=#{Gateway::Value::Query.to_encoded(songs.map(&:origin_id).join('-'))}"
+            routing.redirect "search/results/?i=#{Base64.urlsafe_encode64(songs.map(&:origin_id).join('-'))}"
           rescue StandardError => e
             App.logger.error(e)
             flash[:error] = MSG_NO_SEARCH_RESULTS
@@ -86,12 +87,16 @@ module LyricLab
           end
         end
 
-        routing.on 'search_results' do
-          # GET /search/search_results?i={search_ids}
+        routing.on 'results' do
+          # GET /search/results/?i={search_ids}
           routing.get do
-            search_ids = routing.params['i']
+            # puts "before: search_ids: #{routing.params['i']}"
+            search_ids = Base64.urlsafe_decode64(routing.params['i'])
+            # puts "search_ids: #{search_ids}"
+
             result = Service::LoadSearchResults.new.call(search_ids.split('-'))
-            raise result.failure if result.failure?
+            # puts "results: #{result.inspect}"
+            raise result.failure.to_s if result.failure?
 
             search_results = result.value!.songs
             viewable_search_results = Views::SongsList.new(search_results)

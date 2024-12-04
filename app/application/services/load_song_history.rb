@@ -20,7 +20,7 @@ module LyricLab
         result.success? ? Success(result.payload) : Failure(result.message)
       rescue StandardError => e
         App.logger.error e.inspect
-        App.logger.error e.backtrace
+        App.logger.error e.backtrace.join("\n")
         Failure('Cannot find songs right now; please try again later')
       end
 

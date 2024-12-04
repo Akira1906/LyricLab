@@ -18,13 +18,13 @@ gem 'ruby-openai', '~> 6.3'
 # APPLICATION LAYER
 # Web application related
 gem 'logger', '~> 1.6'
-gem 'puma', '~> 6.0'
-gem 'rack-session', '~> 0.3'
-gem 'roda', '~> 3.0'
 gem 'multi_json', '~> 1.15'
 gem 'ostruct', '~> 0.0'
-gem 'roar', '~> 1.0'
+gem 'puma', '~> 6.0'
 gem 'rack-cache'
+gem 'rack-session', '~> 0.3'
+gem 'roar', '~> 1.0'
+gem 'roda', '~> 3.0'
 
 # Controllers and services
 gem 'dry-monads', '~> 1.4'
@@ -52,6 +52,9 @@ gem 'sequel', '~> 5.0'
 gem 'csv'
 gem 'rexml', '>= 3.3.9'
 gem 'tradsim'
+
+# Security
+gem 'rbnacl'
 
 group :development, :test do
   gem 'roo'
