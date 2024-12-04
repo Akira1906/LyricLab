@@ -58,7 +58,7 @@ module LyricLab
           viewable_recommendations = Views::SongsList.new(recommendations)
         end
 
-        response.expires 60, public: true
+        # response.expires 60, public: true
         puts "Recommendations: #{viewable_recommendations.inspect}, Song History: #{viewable_song_history.inspect}"
         view 'home', locals: { recommendations: viewable_recommendations, song_history: viewable_song_history }
       rescue StandardError => e
