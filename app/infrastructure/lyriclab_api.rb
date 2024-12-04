@@ -73,6 +73,7 @@ module LyricLab
 
         def load_songs(origin_ids)
           call_api('get', ['search_results', origin_ids])
+          # call_api('get', ['search_results', 'indexes' => Value::Query.to_encoded(origin_ids)])
         end
 
         private
@@ -85,7 +86,7 @@ module LyricLab
         def call_api(method, resources = [], params = {})
           api_path = resources.empty? ? @api_host : @api_root
           url = [api_path, resources].flatten.join('/') + params_str(params)
-          puts url
+          puts "Call API:#{url}"
           HTTP.headers('Accept' => 'application/json').send(method, url)
             .then { |http_response| Response.new(http_response) }
         rescue StandardError
@@ -101,6 +102,10 @@ module LyricLab
 
         def success?
           code.between?(SUCCESS_CODES.first, SUCCESS_CODES.last)
+        end
+
+        def failure?
+          !success?
         end
 
         def message

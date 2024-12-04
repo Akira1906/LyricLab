@@ -14,20 +14,23 @@ module LyricLab
       def get_songs(ids)
         result = Gateway::Api.new(LyricLab::App.config)
           .load_songs(ids.join('-'))
-
+        puts "LoadSearchResults: #{result}"
+        Failure('There are no songs to be loaded') if result.failure?
         result.success? ? Success(result.payload) : Failure(result.message)
       rescue StandardError => e
-        puts e.inspect
-        puts e.backtrace
-        Failure('Cannot find songs right now; please try again later')
+        App.logger.error e.inspect
+        App.logger.error e.backtrace
+        Failure('Cannot LoadSearchResults right now')
       end
 
       def reify_songs(songs_json)
         Representer::SearchResults.new(OpenStruct.new)
           .from_json(songs_json)
           .then { |songs| Success(songs) }
-      rescue StandardError
-        Failure('Error in the Load Songs -- please try again')
+      rescue StandardError => e
+        App.logger.error e.inspect
+        App.logger.error e.backtrace
+        Failure('Error in LoadSearchResults')
       end
     end
   end

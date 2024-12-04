@@ -5,7 +5,7 @@ require 'dry/transaction'
 module LyricLab
   module Service
     # Retrieves array of all listed project entities
-    class Record
+    class RecordRecommendation
       include Dry::Transaction
 
       step :record_request
@@ -16,8 +16,8 @@ module LyricLab
 
         result.success? ? Success(result.payload) : Failure(result.message)
       rescue StandardError => e
-        puts e.inspect
-        puts e.backtrace
+        App.logger.error e.inspect
+        App.logger.error e.backtrace
         Failure('Cannot record recommendation right now; please try again later')
       end
     end

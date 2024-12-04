@@ -18,6 +18,8 @@ module LyricLab
       property :artist_name_string
       property :search_cnt
       property :origin_id
+      property :language_difficulty
+      property :cover_image_url_small
     end
   end
 end

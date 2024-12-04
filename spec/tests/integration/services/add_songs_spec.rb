@@ -4,7 +4,7 @@ require_relative '../../../helpers/spec_helper'
 require_relative '../../../helpers/vcr_helper'
 require_relative '../../../helpers/database_helper'
 
-describe 'AddSongs Service Integration Test' do
+describe 'FindSongsFromSearch Service Integration Test' do
   VcrHelper.setup_vcr
 
   before do
@@ -25,7 +25,7 @@ describe 'AddSongs Service Integration Test' do
       bad_request = LyricLab::Forms::NewSearch.new.call(search_query: 'Vivaldi')
 
       # WHEN: the service is called with the request form object
-      result = LyricLab::Service::AddSongs.new.call(bad_request)
+      result = LyricLab::Service::FindSongsFromSearch.new.call(bad_request)
 
       # THEN: the service should report failure with an error message
       _(result.success?).must_equal false
@@ -37,7 +37,7 @@ describe 'AddSongs Service Integration Test' do
       another_bad_request = LyricLab::Forms::NewSearch.new.call(search_query: 'ssshhhiiittt!')
 
       # WHEN: the service is called with the request form object
-      result = LyricLab::Service::AddSongs.new.call(another_bad_request)
+      result = LyricLab::Service::FindSongsFromSearch.new.call(another_bad_request)
 
       # THEN: the service should report failure with an error message
       _(result.success?).must_equal false
@@ -49,7 +49,7 @@ describe 'AddSongs Service Integration Test' do
       missing_request = LyricLab::Forms::NewSearch.new.call(search_query: '')
 
       # WHEN: the service is called with the request form object
-      result = LyricLab::Service::AddSongs.new.call(missing_request)
+      result = LyricLab::Service::FindSongsFromSearch.new.call(missing_request)
 
       # THEN: the service should report failure with an error message
       _(result.success?).must_equal false

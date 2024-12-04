@@ -21,8 +21,8 @@ module LyricLab
 
         result.success? ? Success(result.payload) : Failure(result.message)
       rescue StandardError => e
-        puts e.inspect
-        puts e.backtrace
+        App.logger.error e.inspect
+        App.logger.error e.backtrace
         Failure('Cannot create vocabularies right now; please try again later')
       end
 

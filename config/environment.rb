@@ -30,9 +30,9 @@ module LyricLab
 
     configure :development do
       use Rack::Cache,
-      verbose: true,
-      metastore: 'file:_cache/rack/meta',
-      entitystore: 'file:_cache/rack/body'
+          verbose: true,
+          metastore: 'file:_cache/rack/meta',
+          entitystore: 'file:_cache/rack/body'
     end
 
     # Database Setup
@@ -44,26 +44,5 @@ module LyricLab
     class << self
       attr_reader :logger
     end
-
-    # Word List Setup (load into memory)
-    # word_list[[characters, pinyin, word_type], ...]
-    @word_list = YAML.load_file('files/mandarin_word_list.yml')
-    @merged_word_list = @word_list.values.flatten(1)
-
-    # [beginner, novice1, novice2, level1, level2, level3, level4, level5]
-    @list_indexes = [0]
-    current_index = 0
-
-    @word_list.each_value do |list|
-      current_index += list.size
-      @list_indexes << current_index
-    end
-
-    @merged_word_list = @merged_word_list.map! { |word| word[0] }
-    class << self
-      attr_reader :merged_word_list
-    end
-    def self.list_indexes = @list_indexes # rubocop:disable Style/TrivialAccessors
-    def self.word_list = @word_list # rubocop:disable Style/TrivialAccessors
   end
 end

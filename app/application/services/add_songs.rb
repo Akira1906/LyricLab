@@ -5,7 +5,7 @@ require 'dry/transaction'
 module LyricLab
   module Service
     # Transaction to store project from Github API to database
-    class AddSongs
+    class FindSongsFromSearch
       include Dry::Transaction
 
       step :parse_search_string
@@ -29,8 +29,8 @@ module LyricLab
 
         result.success? ? Success(result.payload) : Failure(result.message)
       rescue StandardError => e
-        puts e.inspect
-        puts e.backtrace
+        App.logger.error e.inspect
+        App.logger.error e.backtrace
         Failure('Cannot find songs right now; please try again later')
       end
 
