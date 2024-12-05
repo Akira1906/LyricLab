@@ -8,12 +8,15 @@ module LyricLab
     class LoadVocabulary
       include Dry::Transaction
 
-      GPT_API_KEY = LyricLab::App.config.GPT_API_KEY
-
       step :populate_vocabulary
       step :reify_vocabulary
 
+      MSG_NO_VOCABULARY = 'Failed to generate vocabulary.'
+      MSG_REIFY_FAILED = 'Error in the LoadVocabulary.'
+
       private
+
+      GPT_API_KEY = LyricLab::App.config.GPT_API_KEY
 
       def populate_vocabulary(origin_id)
         result = Gateway::Api.new(LyricLab::App.config)
@@ -23,7 +26,7 @@ module LyricLab
       rescue StandardError => e
         App.logger.error e.inspect
         App.logger.error e.backtrace.join("\n")
-        Failure('Cannot create vocabularies right now; please try again later')
+        Failure(MSG_NO_VOCABULARY)
       end
 
       def reify_vocabulary(songs_json)
@@ -31,7 +34,7 @@ module LyricLab
           .from_json(songs_json)
           .then { |songs| Success(songs) }
       rescue StandardError
-        Failure('Error in the Song -- please try again')
+        Failure(MSG_REIFY_FAILED)
       end
     end
   end

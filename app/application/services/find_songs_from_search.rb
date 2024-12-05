@@ -12,6 +12,9 @@ module LyricLab
       step :request_songs
       step :reify_songs
 
+      MSG_NO_SONGS = 'Can\'t find songs right now; please try again later.'
+      MSG_REIFY_FAILED = 'Error in the FindSongsFromSearch.'
+
       private
 
       def parse_search_string(input)
@@ -31,7 +34,7 @@ module LyricLab
       rescue StandardError => e
         App.logger.error e.inspect
         App.logger.error e.backtrace.join("\n")
-        Failure('Cannot find songs right now; please try again later')
+        Failure(MSG_NO_SONGS)
       end
 
       def reify_songs(songs_json)
@@ -39,7 +42,7 @@ module LyricLab
           .from_json(songs_json)
           .then { |songs| Success(songs) }
       rescue StandardError
-        Failure('Error in the Search Results -- please try again')
+        Failure(MSG_REIFY_FAILED)
       end
     end
   end

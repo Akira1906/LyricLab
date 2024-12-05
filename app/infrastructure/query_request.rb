@@ -16,7 +16,7 @@ module LyricLab
           Base64.urlsafe_encode64(query.to_json)
         end
 
-        # Use in tests to create a WatchedList object from a list
+        # Use in tests
         def self.to_request(query)
           Query.new('search_query' => to_encoded(query))
         end

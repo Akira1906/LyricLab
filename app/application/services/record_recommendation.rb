@@ -10,6 +10,10 @@ module LyricLab
 
       step :record_request
 
+      MSG_ERROR_RECORD = 'Failed to record recommendation.'
+
+      private
+
       def record_request(origin_id)
         result = Gateway::Api.new(LyricLab::App.config)
           .record_recommendation(origin_id)
@@ -18,7 +22,7 @@ module LyricLab
       rescue StandardError => e
         App.logger.error e.inspect
         App.logger.error e.backtrace.join("\n")
-        Failure('Cannot record recommendation right now; please try again later')
+        Failure(MSG_ERROR_RECORD)
       end
     end
   end
