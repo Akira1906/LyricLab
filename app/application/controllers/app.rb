@@ -31,37 +31,39 @@ module LyricLab
     MSG_ERROR = 'Something went wrong'
 
     route do |routing| # rubocop:disable Metrics/BlockLength
+      routing.public
       routing.assets # load CSS
       response['Content-Type'] = 'text/html; charset=utf-8'
-      routing.public
-      session[:song_history] ||= []
+
+      # cookies
+      session[:search_history] ||= []
+      session[:lang_difficulty] ||= ''
 
       # GET /
       routing.root do
-        session[:search_result_ids] = []
 
-        viewable_song_history = Service::LoadSongHistory.new.call(session[:song_history])
-        viewable_song_history = if viewable_song_history.failure?
-                                  flash[:error]
+        viewable_search_history = Service::LoadSongsById.new.call(session[:search_history])
+        viewable_search_history = if viewable_search_history.failure?
+                                  flash[:error] = MSG_ERROR
                                   []
                                 else
-                                  viewable_song_history.value!
+                                  Views::SongsList.new(viewable_search_history.value!.songs)
                                 end
 
         # TODO: get recommendations for each language_level from the API
-        result = Service::ListRecommendations.new.call
-        viewable_recommendations = []
-        if result.failure?
+        viewable_recommendations = Service::ListRecommendations.new.call
+        if viewable_recommendations.failure?
           flash.now[:error] = MSG_NO_RECOMMENDATIONS
+          viewable_recommendations = []
         else
-          recommendations = result.value!.recommendations
-          flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if recommendations.none?
-          viewable_recommendations = Views::SongsList.new(recommendations)
+          viewable_recommendations = viewable_recommendations.value!.recommendations
+          flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if viewable_recommendations.none?
+          viewable_recommendations = Views::SongsList.new(viewable_recommendations)
         end
 
         # response.expires 60, public: true
-        puts "Recommendations: #{viewable_recommendations.inspect}, Song History: #{viewable_song_history.inspect}"
-        view 'home', locals: { recommendations: viewable_recommendations, song_history: viewable_song_history }
+        # puts "Recommendations: #{viewable_recommendations.inspect}, Search History: #{viewable_search_history.inspect}"
+        view 'home', locals: { recommendations: viewable_recommendations, song_history: viewable_search_history }
       rescue StandardError => e
         App.logger.error(e)
         flash[:error] = MSG_ERROR
@@ -95,7 +97,7 @@ module LyricLab
             search_ids = Base64.urlsafe_decode64(routing.params['i'])
             # puts "search_ids: #{search_ids}"
 
-            result = Service::LoadSearchResults.new.call(search_ids.split('-'))
+            result = Service::LoadSongsById.new.call(search_ids.split('-'))
             # puts "results: #{result.inspect}"
             raise result.failure.to_s if result.failure?
 
@@ -121,6 +123,8 @@ module LyricLab
             raise vocabulary_song.failure if vocabulary_song.failure?
 
             vocabulary_song = vocabulary_song.value!
+
+            session[:search_history] << vocabulary_song.origin_id
 
             viewable_song = Views::Song.new(vocabulary_song)
 

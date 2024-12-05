@@ -40,14 +40,6 @@ gem 'dry-types', '~> 1.7'
 # Networking
 gem 'http', '~> 5.2.0'
 
-# Google API
-gem 'google-cloud-translate-v2'
-
-# Database
-gem 'hirb'
-# gem 'hirb-unicode' # incompatible with new rubocop
-gem 'sequel', '~> 5.0'
-
 # Word Processing
 gem 'csv'
 gem 'rexml', '>= 3.3.9'
@@ -58,7 +50,6 @@ gem 'rbnacl'
 
 group :development, :test do
   gem 'roo'
-  gem 'sqlite3', '~> 1.0'
 end
 
 group :production do
