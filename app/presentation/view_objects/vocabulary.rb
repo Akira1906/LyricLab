@@ -32,7 +32,16 @@ module Views
 
     def rich_text
       Slim::Template.new('app/presentation/views_html/rich_text.slim')
-      .render(self, vocabulary: self, song: @song)
+        .render(self, vocabulary: self, song: @song)
+    end
+
+    def marked_text
+      marked_text = raw_text
+      unique_words.map(&:characters).sort_by(&:length).reverse.each do |word|
+        marked_text.gsub!(word, "\\@#{word}\\$")
+      end
+      puts "text: #{marked_text}"
+      marked_text
     end
 
     def entity

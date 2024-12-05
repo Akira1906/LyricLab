@@ -79,7 +79,7 @@ module LyricLab
 
             songs = search_results.value!.songs
             session[:search_result_ids] = songs.map(&:origin_id)
-            puts "search/results/?i=#{Gateway::Value::Query.to_encoded(songs.map(&:origin_id).join('-'))}"
+
             routing.redirect "search/results/?i=#{Base64.urlsafe_encode64(songs.map(&:origin_id).join('-'))}"
           rescue StandardError => e
             App.logger.error(e)

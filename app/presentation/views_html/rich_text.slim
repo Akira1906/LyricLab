@@ -39,29 +39,53 @@
         label.ms-2 for="level5Check" Level 5
 
 .lyrics.p-4 style="font-size: 1.2rem;"
-  - if vocabulary.respond_to?(:raw_text) && vocabulary.raw_text
-    - lines = vocabulary.raw_text.split("\n")
+  - if vocabulary.respond_to?(:raw_text) && vocabulary.raw_text && vocabulary.marked_text
+    - lines = vocabulary.marked_text.split("\n")
+    - puts "Vocabulary Words:#{vocabulary.unique_words.map(&:characters)}"
     - lines.each do |line|
       .line.mb-3 style="letter-spacing: -1px; line-height: 1.1;"
-        - line.split.each do |text_word|
-          - unique_word = vocabulary.unique_words.find { |w| w.characters == text_word }
-          - if unique_word
-            span[
-              class="#{unique_word.language_level} cursor-pointer vocabulary-word"
-              style="cursor: pointer;"
-              onclick="handleWordClick(this)"
-              data-word=unique_word.characters
-              data-translation=unique_word.translation
-              data-pinyin=unique_word.pinyin
-              data-definition=unique_word.definition
-              data-example=unique_word.example_sentence
-              data-level=unique_word.language_level.gsub('-class', '')
-            ] = "#{text_word} "
-            span.word-space<> = " "
-          - else
-            span = text_word
-            span.word-space<> = " "
-
+        - puts "splitted lines#{line.split}"
+        - left = 0
+        - in_marked_word = 0
+        - for right in 0..line.length
+          - print(line[right])
+          - if line[right] == '\\' && line[right + 1] == '@' && in_marked_word == 0
+            - if left < right
+              - word = line[left...right].gsub(/[\\@$]/, '')
+              span = word
+              span.word-space<> = " "
+            - left = right + 2
+          - if line[right] == '\\' && line[right + 1] == '$' && in_marked_word == 1
+            - puts "pointer area: #{line[left...right]}"
+            - word = line[left...right].gsub(/[\\@$]/, '')
+            - left = right + 2
+            - puts "in_marked_word: #{in_marked_word}"
+            - puts "word: #{word}"
+            - unique_word = vocabulary.unique_words.find { |w| w.characters == word }
+            - if unique_word
+              - puts "found unique_word: #{unique_word.characters}"
+              span[
+                class="#{unique_word.language_level} cursor-pointer vocabulary-word"
+                style="cursor: pointer;"
+                onclick="handleWordClick(this)"
+                data-word=unique_word.characters
+                data-translation=unique_word.translation
+                data-pinyin=unique_word.pinyin
+                data-definition=unique_word.definition
+                data-example=unique_word.example_sentence
+                data-level=unique_word.language_level.gsub('-class', '')
+              ] = "#{word} "
+              span.word-space<> = " "
+            - else 
+              span = word
+              span.word-space<> = " "
+          - if line[right] == '\\' and line[right + 1] == '@'
+            - in_marked_word = in_marked_word + 1
+          - if line[right] == '\\' and line[right + 1] == '$'
+            - in_marked_word = in_marked_word - 1
+        - word = line[left...line.length].gsub(/[\\@$]/, '')
+        span = word
+        span.word-space<> = " "
 javascript:
   function toggleLevelDropdown(event) {
     if (!event) event = window.event;
