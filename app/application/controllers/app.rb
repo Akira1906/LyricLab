@@ -48,6 +48,7 @@ module LyricLab
                                   viewable_song_history.value!
                                 end
 
+        # TODO: get recommendations for each language_level from the API
         result = Service::ListRecommendations.new.call
         viewable_recommendations = []
         if result.failure?
