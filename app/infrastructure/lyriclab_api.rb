@@ -108,6 +108,18 @@ module LyricLab
           !success?
         end
 
+        def ok?
+          code == 200
+        end
+
+        def added?
+          code == 201
+        end
+
+        def processing?
+          code == 202
+        end
+
         def message
           payload['message']
         end

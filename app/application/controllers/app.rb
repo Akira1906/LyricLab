@@ -41,14 +41,13 @@ module LyricLab
 
       # GET /
       routing.root do
-
         viewable_search_history = Service::LoadSongsById.new.call(session[:search_history])
         viewable_search_history = if viewable_search_history.failure?
-                                  flash[:error] = MSG_ERROR
-                                  []
-                                else
-                                  Views::SongsList.new(viewable_search_history.value!.songs)
-                                end
+                                    flash[:error] = MSG_ERROR
+                                    []
+                                  else
+                                    Views::SongsList.new(viewable_search_history.value!.songs)
+                                  end
 
         # TODO: get recommendations for each language_level from the API
         viewable_recommendations = Service::ListRecommendations.new.call
@@ -119,14 +118,31 @@ module LyricLab
             # The system should still work if the recording fails
             flash.now[:error] = MSG_ERROR_RECORD_RECOMMENDATIONS if record_result.failure?
 
-            vocabulary_song = Service::LoadVocabulary.new.call(origin_id)
-            raise vocabulary_song.failure if vocabulary_song.failure?
+            result = Service::LoadVocabulary.new.call(
+              origin_id: origin_id
+            )
+            puts "result: #{result.inspect}"
+            if result.failure?
+              flash[:error] = result.failure
+              raise result.failure
+            end
 
-            vocabulary_song = vocabulary_song.value!
+            vocabulary_song = OpenStruct.new(result.value!)
+            if vocabulary_song.response.processing?
+              flash[:notice] = 'Vocabulary Information for the song is being generated, ' \
+                               'please check back in a moment(~1 min).'
+              routing.redirect request.referer || '/'
+            end
 
+            vocabulary_song = vocabulary_song.vocabulary_song
             session[:search_history] << vocabulary_song.origin_id
 
             viewable_song = Views::Song.new(vocabulary_song)
+
+            # Only use browser caching in production
+            App.configure :production do
+              response.expires 60, public: true
+            end
 
             # Show viewer the song
             view 'song', locals: { song: viewable_song }

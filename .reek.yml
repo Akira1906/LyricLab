@@ -8,3 +8,4 @@
     - spec/helpers/database_helper.rb   # test helper file not considered
     - spec/helpers/vcr_helper.rb        # test helper file not considered
     - spec/spike-scripts
+    
