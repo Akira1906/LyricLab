@@ -46,12 +46,22 @@
                   .text-uppercase.text-muted.small.mb-1 Language Level
                   .h5.mb-0.d-flex.align-items-center
                     / TODO: add language level show up icon
-                    - level = 3  
-                    - 5.times do |i|
-                      - if i < level
-                        i.fas.fa-star.text-warning.me-1
-                      - else
-                        i.fas.fa-star.text-gray-300.me-1
+                    - if song.vocabulary&.language_difficulty
+                      - level = (song.vocabulary.language_difficulty / 1.4).floor  # 將 0-7 的範圍轉換為 0-5 顆星
+                      - difficulty_label = case song.vocabulary.language_difficulty
+                        - when 0..1.5 then 'Beginner'
+                        - when 1.5..3.5 then 'Intermediate'
+                        - when 3.5..5.0 then 'Advanced'
+                        - when 5.0..6.0 then 'Expert'
+                        - else 'Master'
+                      - 5.times do |i|
+                        - if i < level
+                          i.fas.fa-star.text-warning.me-1 
+                        - else
+                          i.fas.fa-star.text-gray-300.me-1
+                      span.badge.text-bg-secondary.ms-2 = difficulty_label
+                    - else
+                      span.text-muted No difficulty information available
 
                 div.mt-3
                   - if song.origin_id

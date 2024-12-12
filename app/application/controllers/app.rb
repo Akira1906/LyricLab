@@ -31,38 +31,40 @@ module LyricLab
     MSG_ERROR = 'Something went wrong'
 
     route do |routing| # rubocop:disable Metrics/BlockLength
-      routing.public
       routing.assets # load CSS
       response['Content-Type'] = 'text/html; charset=utf-8'
-
-      # cookies
-      session[:search_history] ||= []
-      session[:lang_difficulty] ||= ''
+      routing.public
+      session[:song_history] ||= []
 
       # GET /
       routing.root do
-        viewable_search_history = Service::LoadSongsById.new.call(session[:search_history])
-        viewable_search_history = if viewable_search_history.failure?
-                                    flash[:error] = MSG_ERROR
-                                    []
-                                  else
-                                    Views::SongsList.new(viewable_search_history.value!.songs)
-                                  end
+        session[:search_result_ids] = []
+
+        viewable_song_history = Service::LoadSongHistory.new.call(session[:song_history])
+        viewable_song_history = if viewable_song_history.failure?
+                                  flash[:error]
+                                  []
+                                else
+                                  viewable_song_history.value!
+                                end
 
         # TODO: get recommendations for each language_level from the API
-        viewable_recommendations = Service::ListRecommendations.new.call
-        if viewable_recommendations.failure?
+        result = Service::ListRecommendations.new.call
+        viewable_recommendations = []
+        if result.failure?
           flash.now[:error] = MSG_NO_RECOMMENDATIONS
-          viewable_recommendations = []
         else
-          viewable_recommendations = viewable_recommendations.value!.recommendations
-          flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if viewable_recommendations.none?
-          viewable_recommendations = Views::SongsList.new(viewable_recommendations)
+          recommendations = result.value!.recommendations
+          if recommendations.empty?
+            flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE
+          else
+            viewable_recommendations = Views::SongsList.new(recommendations.to_a)
+          end
         end
 
-        # response.expires 60, public: true
-        # puts "Recommendations: #{viewable_recommendations.inspect}, Search History: #{viewable_search_history.inspect}"
-        view 'home', locals: { recommendations: viewable_recommendations, song_history: viewable_search_history }
+        # TODO:response.expires 60, public: true
+        puts "Recommendations: #{viewable_recommendations.inspect}, Song History: #{viewable_song_history.inspect}"
+        view 'home', locals: { recommendations: viewable_recommendations, song_history: viewable_song_history }
       rescue StandardError => e
         App.logger.error(e)
         flash[:error] = MSG_ERROR
@@ -80,7 +82,7 @@ module LyricLab
 
             songs = search_results.value!.songs
             session[:search_result_ids] = songs.map(&:origin_id)
-
+            puts "search/results/?i=#{Gateway::Value::Query.to_encoded(songs.map(&:origin_id).join('-'))}"
             routing.redirect "search/results/?i=#{Base64.urlsafe_encode64(songs.map(&:origin_id).join('-'))}"
           rescue StandardError => e
             App.logger.error(e)
@@ -96,7 +98,7 @@ module LyricLab
             search_ids = Base64.urlsafe_decode64(routing.params['i'])
             # puts "search_ids: #{search_ids}"
 
-            result = Service::LoadSongsById.new.call(search_ids.split('-'))
+            result = Service::LoadSearchResults.new.call(search_ids.split('-'))
             # puts "results: #{result.inspect}"
             raise result.failure.to_s if result.failure?
 
@@ -118,31 +120,12 @@ module LyricLab
             # The system should still work if the recording fails
             flash.now[:error] = MSG_ERROR_RECORD_RECOMMENDATIONS if record_result.failure?
 
-            result = Service::LoadVocabulary.new.call(
-              origin_id: origin_id
-            )
-            puts "result: #{result.inspect}"
-            if result.failure?
-              flash[:error] = result.failure
-              raise result.failure
-            end
+            vocabulary_song = Service::LoadVocabulary.new.call(origin_id)
+            raise vocabulary_song.failure if vocabulary_song.failure?
 
-            vocabulary_song = OpenStruct.new(result.value!)
-            if vocabulary_song.response.processing?
-              flash[:notice] = 'Vocabulary Information for the song is being generated, ' \
-                               'please check back in a moment(~1 min).'
-              routing.redirect request.referer || '/'
-            end
-
-            vocabulary_song = vocabulary_song.vocabulary_song
-            session[:search_history] << vocabulary_song.origin_id
+            vocabulary_song = vocabulary_song.value!
 
             viewable_song = Views::Song.new(vocabulary_song)
-
-            # Only use browser caching in production
-            App.configure :production do
-              response.expires 60, public: true
-            end
 
             # Show viewer the song
             view 'song', locals: { song: viewable_song }

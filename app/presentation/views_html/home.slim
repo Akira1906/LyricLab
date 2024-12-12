@@ -18,6 +18,7 @@
           h2.mb-4 Top Songs
         .d-flex
           .nav.nav-pills.flex-column.me-3 style="min-width: 100px; "
+            - difficulty_ranges = { beginner: (0..1.5), intermediate: (1.5..3.5), advanced: (3.5..5.0), expert: (5.0..6.0), master: (6.0..7.0) }
             .nav-item
               a.nav-link.active.success.py-1 data-toggle="tab" href="#beginner" Beginner
             .nav-item
@@ -31,17 +32,18 @@
                 
 
           .tab-content.ms-0.flex-grow-1
-            .tab-pane.fade.show.active#overall
-              .table-responsive style="min-height: 300px;"
-                table class="table table-hover" id="recommendations_table"
-                  thead
-                    tr
-                      th style="width: 50px;padding-left: 3rem;"
-                      th style="width :80px;"Title
-                      th style="width :80px;"Artist
-                  tbody
-                    - row_count = 0
-                    - recommendations.each do |song|
+            - difficulty_ranges.each do |level, range|
+              .tab-pane.fade id=level class=('show active' if level == :beginner)
+                .table-responsive style="min-height: 300px;"
+                  table class="table table-hover" id="recommendations_table"
+                    thead
+                     tr
+                        th style="width: 50px;padding-left: 3rem;"
+                        th style="width :80px;"Title
+                        th style="width :80px;"Artist
+                    tbody
+                     - filtered_songs = recommendations.select { |song| range.include?(song.language_difficulty.to_f) }
+                      - filtered_songs.each do |song|
                       tr
                         td style="padding-left: 1rem;"
                           a href=song.result_link
@@ -97,3 +99,15 @@
                             i class="fa-regular fa-eye"
                       td.font-weight-bold= song.title
                       td.font-weight-bold= song.artist
+
+javascript:
+  document.addEventListener('DOMContentLoaded', function() {
+   
+    $('[data-toggle="tab"]').tab();
+
+    const firstTabWithSongs = document.querySelector('.tab-pane:not(:empty)');
+    if (firstTabWithSongs) {
+      const tabId = firstTabWithSongs.id;
+      $(`[href="#${tabId}"]`).tab('show');
+    }
+  });
