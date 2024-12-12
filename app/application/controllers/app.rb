@@ -21,6 +21,8 @@ module LyricLab
 
     use Rack::MethodOverride # allows HTTP verbs beyond GET/POST (e.g., DELETE)
 
+    MAX_SESSION_SIZE = 4096 # to control for cookies size
+
     # Flash messages
     MSG_NO_RECOMMENDATIONS = 'No recommendations found'
     MSG_NO_SEARCH_RESULTS = 'No search results found'
@@ -29,6 +31,7 @@ module LyricLab
     MSG_ERROR_RECORD_RECOMMENDATIONS = 'Can\'t update recommendations based on this action'
     MSG_NO_RECOMMENDATIONS_AVAILABLE = 'No recommendations available yet'
     MSG_ERROR = 'Something went wrong'
+    MSG_COOKIE = 'Couldn\'t load search history' 
 
     route do |routing| # rubocop:disable Metrics/BlockLength
       routing.public
@@ -41,9 +44,22 @@ module LyricLab
 
       # GET /
       routing.root do
+
+        first_time = session[:first_visit].nil?
+        session[:first_visit] = false
+
+        session[:lang_difficulty] = routing.params['language_level'] unless first_time
+        puts session[:lang_difficulty] unless first_time
+
+        # check cookies size
+        session_size = session[:search_history].to_json.bytesize
+        if session_size > MAX_SESSION_SIZE
+          session[:search_history].pop(2)
+        end
+
         viewable_search_history = Service::LoadSongsById.new.call(session[:search_history])
         viewable_search_history = if viewable_search_history.failure?
-                                    flash[:error] = MSG_ERROR
+                                    # flash[:error] = MSG_COOKIE no need to show error
                                     []
                                   else
                                     Views::SongsList.new(viewable_search_history.value!.songs)
@@ -62,7 +78,7 @@ module LyricLab
 
         # response.expires 60, public: true
         # puts "Recommendations: #{viewable_recommendations.inspect}, Search History: #{viewable_search_history.inspect}"
-        view 'home', locals: { recommendations: viewable_recommendations, song_history: viewable_search_history }
+        view 'home', locals: { recommendations: viewable_recommendations, song_history: viewable_search_history, first_time: }
       rescue StandardError => e
         App.logger.error(e)
         flash[:error] = MSG_ERROR
@@ -135,7 +151,9 @@ module LyricLab
             end
 
             vocabulary_song = vocabulary_song.vocabulary_song
-            session[:search_history] << vocabulary_song.origin_id
+            if !session[:search_history].include?(vocabulary_song.origin_id)
+              session[:search_history] << vocabulary_song.origin_id
+            end
 
             viewable_song = Views::Song.new(vocabulary_song)
 
