@@ -432,3 +432,24 @@ span.level5-class {
 #start-learning:hover {
   transform: translateY(-1px);
 }
+
+.vocabulary-word {
+  transition: all 0.3s ease;
+}
+
+/* 默认隐藏所有单词的颜色 */
+.vocabulary-word {
+  color: inherit !important;
+  background-color: transparent !important;
+}
+
+/* 当对应level被选中时才显示颜色 */
+.vocabulary-word.active-level {
+  color: inherit; /* 使用原本定义的颜色 */
+}
+
+.word-hidden {
+  color: inherit !important;
+  background-color: transparent !important;
+  cursor: default !important;
+}

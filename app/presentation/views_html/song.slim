@@ -43,10 +43,12 @@
                       = song.popularity
 
                 div.mb-3
-                  .text-uppercase.text-muted.small.mb-1 Language Level
+                  .text-uppercase.text-muted.small.mb-1 
+                    | Language Level 
+                    / span.ms-2.badge style="background-color: #{song.vocabulary.difficulty_color}"
+                    /   = song.vocabulary.difficulty_text
                   .h5.mb-0.d-flex.align-items-center
-                    / TODO: add language level show up icon
-                    - level = 3  
+                    - level = song.vocabulary.language_difficulty
                     - 5.times do |i|
                       - if i < level
                         i.fas.fa-star.text-warning.me-1

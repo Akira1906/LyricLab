@@ -50,6 +50,22 @@ module LyricLab
                                   end
 
         # TODO: get recommendations for each language_level from the API
+        language_difficulties = [1,3,4,5,7]
+        # this is gonna be a list of song metadata lists
+        viewable_recommendations_all_difficulties = []
+        language_difficulties.each do |language_difficulty|
+          viewable_recommendations_all_difficulties.append(Service::ListTargetedRecommendations.new.call(language_difficulty))
+          if viewable_recommendations_all_difficulties[-1].failure?
+            flash.now[:error] = MSG_NO_RECOMMENDATIONS
+            viewable_recommendations_all_difficulties[-1] = []
+          else
+            viewable_recommendations_all_difficulties[-1] = viewable_recommendations_all_difficulties[-1].value!.recommendations
+            flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if viewable_recommendations_all_difficulties[-1].none?
+            viewable_recommendations_all_difficulties[-1] = Views::SongsList.new(viewable_recommendations_all_difficulties[-1])
+          end
+        end
+        puts "viewable_recommendations_all_difficulties: #{viewable_recommendations_all_difficulties.inspect}"
+
         viewable_recommendations = Service::ListRecommendations.new.call
         if viewable_recommendations.failure?
           flash.now[:error] = MSG_NO_RECOMMENDATIONS
@@ -68,6 +84,7 @@ module LyricLab
         flash[:error] = MSG_ERROR
         routing.redirect '/'
       end
+
 
       routing.on 'search' do # rubocop:disable Metrics/BlockLength
         routing.is do

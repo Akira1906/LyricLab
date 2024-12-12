@@ -11,31 +11,31 @@
 
   .level-button-container
     button#levelButton.btn.btn-outline-success.ms-auto onclick="toggleLevelDropdown(event)" Select vocabulary level
-    / TODO:default checkbox should filter by language skill
+    
     #levelDropdown.level-dropdown-content
       .level-checkbox
-        input type="checkbox" id="beginnerCheck" checked=true
+        input type="checkbox" id="beginnerCheck" checked=vocabulary.level_checked?('beginner')
         label.ms-2 for="beginnerCheck" Beginner
       .level-checkbox
-        input type="checkbox" id="novice1Check" checked=true
+        input type="checkbox" id="novice1Check" checked=vocabulary.level_checked?('novice1')
         label.ms-2 for="novice1Check" Novice 1
       .level-checkbox
-        input type="checkbox" id="novice2Check" checked=true
+        input type="checkbox" id="novice2Check" checked=vocabulary.level_checked?('novice2')
         label.ms-2 for="novice2Check" Novice 2
       .level-checkbox
-        input type="checkbox" id="level1Check" checked=true
+        input type="checkbox" id="level1Check" checked=vocabulary.level_checked?('level1')
         label.ms-2 for="level1Check" Level 1
       .level-checkbox
-        input type="checkbox" id="level2Check" checked=true
+        input type="checkbox" id="level2Check" checked=vocabulary.level_checked?('level2')
         label.ms-2 for="level2Check" Level 2
       .level-checkbox
-        input type="checkbox" id="level3Check" checked=true
+        input type="checkbox" id="level3Check" checked=vocabulary.level_checked?('level3')
         label.ms-2 for="level3Check" Level 3
       .level-checkbox
-        input type="checkbox" id="level4Check" checked=true
+        input type="checkbox" id="level4Check" checked=vocabulary.level_checked?('level4')
         label.ms-2 for="level4Check" Level 4
       .level-checkbox
-        input type="checkbox" id="level5Check" checked=true
+        input type="checkbox" id="level5Check" checked=vocabulary.level_checked?('level5')
         label.ms-2 for="level5Check" Level 5
 
 .lyrics.p-4 style="font-size: 1.2rem;"
@@ -99,6 +99,7 @@ javascript:
     event.stopPropagation();
   });
 
+
   document.addEventListener('click', function(event) {
     const dropdowns = document.getElementsByClassName("level-dropdown-content");
     for (let dropdown of dropdowns) {
@@ -108,23 +109,25 @@ javascript:
     }
   });
 
+
   document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll('.level-checkbox input');
+    
+
+    updateActiveWords();
+    
+    
     for (let checkbox of checkboxes) {
       checkbox.addEventListener('change', function() {
         const level = this.id.replace('Check', '');
-        const words = document.querySelectorAll('.vocabulary-word[data-level="' + level + '"]');
-        for (let word of words) {
-          if (this.checked) {
-            word.classList.remove('word-hidden');
-          } else {
-            word.classList.add('word-hidden');
-          }
-        }
-
+        
+    
+        updateActiveWords();
+        
+      
         const cards = document.querySelectorAll('.word-card');
         for (let card of cards) {
-          const levelSpan = card.querySelector('span[class*="' + level + '-class"]');
+          const levelSpan = card.querySelector(`span[class*="${level}-class"]`);
           if (levelSpan && !this.checked) {
             card.remove();
           }
@@ -133,14 +136,41 @@ javascript:
     }
   });
 
+
+  function updateActiveWords() {
+    const allWords = document.querySelectorAll('.vocabulary-word');
+    
+  
+    allWords.forEach(word => {
+      word.classList.remove('active-level');
+      word.classList.add('word-hidden');
+    });
+    
+
+    const checkedLevels = Array.from(document.querySelectorAll('.level-checkbox input:checked'))
+      .map(checkbox => checkbox.id.replace('Check', ''));
+    
+  
+    checkedLevels.forEach(level => {
+      const levelWords = document.querySelectorAll(`.vocabulary-word[data-level="${level}"]`);
+      levelWords.forEach(word => {
+        word.classList.add('active-level');
+        word.classList.remove('word-hidden');
+      });
+    });
+  }
+
+
   function handleWordClick(element) {
-    if (element.classList.contains('word-hidden')) return;
+    if (element.classList.contains('word-hidden') || !element.classList.contains('active-level')) {
+      return;
+    }
 
     const level = element.dataset.level;
     const checkbox = document.getElementById(`${level}Check`);
-    if (!checkbox || !checkbox.checked || element.classList.contains('word-hidden')) {
+    if (!checkbox || !checkbox.checked) {
       return;
-    } 
+    }
 
     const wordData = {
       word: element.dataset.word,
@@ -194,16 +224,16 @@ javascript:
         <button class="btn text-dark" style="padding: 0 10px; font-size: 1.5rem; line-height: 1;" onclick="removeWord(this)">×</button>
       </div>
     </div>
-  `;
+    `;
     
     const vocabularyDetails = document.getElementById('vocabulary-details');
     vocabularyDetails.insertBefore(card, vocabularyDetails.firstChild);
   }
- 
+
   function removeWord(button) {
     button.closest('.word-card').remove();
   }
-  
+
   function getLevelName(level) {
     const levelMap = {
       'beginner': 'Beginner',

@@ -16,6 +16,10 @@ module LyricLab
         @request.get_root.success?
       end
 
+      def list_targeted_recommendations(language_difficulty)
+        @request.list_targeted_recommendations(language_difficulty)
+      end
+
       def list_recommendations
         @request.list_recommendations
       end
@@ -49,6 +53,11 @@ module LyricLab
 
         def get_root # rubocop:disable Naming/AccessorMethodName
           call_api('get')
+        end
+
+        # List_recommendations
+        def list_targeted_recommendations(language_difficulty)
+          call_api('get', ['recommendations','targeted'], 'language_difficulty' => language_difficulty)
         end
 
         def list_recommendations
