@@ -31,7 +31,7 @@ module LyricLab
     MSG_ERROR_RECORD_RECOMMENDATIONS = 'Can\'t update recommendations based on this action'
     MSG_NO_RECOMMENDATIONS_AVAILABLE = 'No recommendations available yet'
     MSG_ERROR = 'Something went wrong'
-    MSG_COOKIE = 'Couldn\'t load search history' 
+    MSG_COOKIE = 'Couldn\'t load search history'
 
     route do |routing| # rubocop:disable Metrics/BlockLength
       routing.public
@@ -44,7 +44,6 @@ module LyricLab
 
       # GET /
       routing.root do
-
         first_time = session[:first_visit].nil?
         session[:first_visit] = false
 
@@ -53,9 +52,7 @@ module LyricLab
 
         # check cookies size
         session_size = session[:search_history].to_json.bytesize
-        if session_size > MAX_SESSION_SIZE
-          session[:search_history].pop(2)
-        end
+        session[:search_history].pop(2) if session_size > MAX_SESSION_SIZE
 
         viewable_search_history = Service::LoadSongsById.new.call(session[:search_history])
         viewable_search_history = if viewable_search_history.failure?
@@ -78,7 +75,8 @@ module LyricLab
 
         # response.expires 60, public: true
         # puts "Recommendations: #{viewable_recommendations.inspect}, Search History: #{viewable_search_history.inspect}"
-        view 'home', locals: { recommendations: viewable_recommendations, song_history: viewable_search_history, first_time: }
+        view 'home',
+             locals: { recommendations: viewable_recommendations, song_history: viewable_search_history, first_time: }
       rescue StandardError => e
         App.logger.error(e)
         flash[:error] = MSG_ERROR
@@ -89,6 +87,7 @@ module LyricLab
         routing.is do
           # POST /search/
           routing.post do
+            response.expires 60, public: true
             search_string = Forms::NewSearch.new.call(routing.params)
             search_results = Service::FindSongsFromSearch.new.call(search_string)
             puts "search_results: #{search_results.inspect}"
@@ -151,7 +150,7 @@ module LyricLab
             end
 
             vocabulary_song = vocabulary_song.vocabulary_song
-            if !session[:search_history].include?(vocabulary_song.origin_id)
+            unless session[:search_history].include?(vocabulary_song.origin_id)
               session[:search_history] << vocabulary_song.origin_id
             end
 
