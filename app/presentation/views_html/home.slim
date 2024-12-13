@@ -69,6 +69,17 @@
                       td.font-weight-bold= song.title
                       td.font-weight-bold= song.artist
 
+javascript:
+  document.addEventListener('DOMContentLoaded', function() {
+   
+    $('[data-toggle="tab"]').tab();
+
+    const firstTabWithSongs = document.querySelector('.tab-pane:not(:empty)');
+    if (firstTabWithSongs) {
+      const tabId = firstTabWithSongs.id;
+      $(`[href="#${tabId}"]`).tab('show');
+    }
+  });
   / Language Level Modal
   .modal.fade#languageModal tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true"
     .modal-dialog
