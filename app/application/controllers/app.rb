@@ -28,7 +28,9 @@ module LyricLab
     MSG_NO_VOCABULARY = 'Can\'t find vocabulary for this song'
     MSG_ERROR_RECORD_RECOMMENDATIONS = 'Can\'t update recommendations based on this action'
     MSG_NO_RECOMMENDATIONS_AVAILABLE = 'No recommendations available yet'
+    MSG_TARGETED_RECOMMENDATIONS_NOT_AVAILABLE = 'For some language difficulties, no recommendations are available'
     MSG_ERROR = 'Something went wrong'
+    MSG_NO_SEARCH_HISTORY = 'No search history available'
 
     route do |routing| # rubocop:disable Metrics/BlockLength
       routing.public
@@ -43,25 +45,28 @@ module LyricLab
       routing.root do
         viewable_search_history = Service::LoadSongsById.new.call(session[:search_history])
         viewable_search_history = if viewable_search_history.failure?
-                                    flash[:error] = MSG_ERROR
+                                    flash[:error] = MSG_NO_SEARCH_HISTORY
                                     []
                                   else
                                     Views::SongsList.new(viewable_search_history.value!.songs)
                                   end
 
-        # TODO: get recommendations for each language_level from the API
-        language_difficulties = [1,3,4,5,7]
-        # this is gonna be a list of song metadata lists
+        language_difficulties = [1, 3, 4, 5, 7]
         viewable_recommendations_all_difficulties = []
         language_difficulties.each do |language_difficulty|
           viewable_recommendations_all_difficulties.append(Service::ListTargetedRecommendations.new.call(language_difficulty))
           if viewable_recommendations_all_difficulties[-1].failure?
-            flash.now[:error] = MSG_NO_RECOMMENDATIONS
+            flash.now[:error] = MSG_TARGETED_RECOMMENDATIONS_NOT_AVAILABLE
             viewable_recommendations_all_difficulties[-1] = []
           else
-            viewable_recommendations_all_difficulties[-1] = viewable_recommendations_all_difficulties[-1].value!.recommendations
-            flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if viewable_recommendations_all_difficulties[-1].none?
-            viewable_recommendations_all_difficulties[-1] = Views::SongsList.new(viewable_recommendations_all_difficulties[-1])
+            viewable_recommendations_all_difficulties[-1] =
+              viewable_recommendations_all_difficulties[-1].value!.recommendations
+            if viewable_recommendations_all_difficulties[-1].none?
+              flash.now[:notice] =
+                MSG_TARGETED_RECOMMENDATIONS_NOT_AVAILABLE
+            end
+            viewable_recommendations_all_difficulties[-1] =
+              Views::SongsList.new(viewable_recommendations_all_difficulties[-1])
           end
         end
         puts "viewable_recommendations_all_difficulties: #{viewable_recommendations_all_difficulties.inspect}"
@@ -84,7 +89,6 @@ module LyricLab
         flash[:error] = MSG_ERROR
         routing.redirect '/'
       end
-
 
       routing.on 'search' do # rubocop:disable Metrics/BlockLength
         routing.is do
