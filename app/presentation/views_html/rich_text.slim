@@ -1,3 +1,39 @@
+/ 在 rich_text.slim 頂部添加
+javascript:
+  document.addEventListener('DOMContentLoaded', function() {
+    // 定義語言等級與詞彙等級的對應關係
+    const LEVEL_MAPPINGS = {
+      'beginner': ['beginner', 'novice1', 'novice2'],
+      'intermediate': ['novice2', 'level1', 'level2'],
+      'advanced': ['level2', 'level3', 'level4'],
+      'expert': ['level3', 'level4', 'level5'],
+      'master': ['level4', 'level5']
+    };
+
+    // 監聽全局的語言等級變化事件
+    window.addEventListener('languageLevelChanged', function(e) {
+      const selectedLevel = e.detail.level;
+      const levelsToBeCheked = LEVEL_MAPPINGS[selectedLevel] || [];
+      
+      // 取消所有勾選
+      document.querySelectorAll('.level-checkbox input').forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      
+      // 根據選擇的語言等級勾選對應的詞彙等級
+      levelsToBeCheked.forEach(level => {
+        const checkbox = document.getElementById(`${level}Check`);
+        if (checkbox) {
+          checkbox.checked = true;
+        }
+      });
+      
+      // 更新單詞顯示
+      updateActiveWords();
+    });
+  });
+
+
 .d-flex.justify-content-between.align-items-center.mb-3
   div
     h3.mb-0 Lyrics

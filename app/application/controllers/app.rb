@@ -48,6 +48,8 @@ module LyricLab
         first_time = session[:first_visit].nil?
         session[:first_visit] = false
 
+        # current_level = session['language_level'] || 'beginner'
+
         session[:lang_difficulty] = routing.params['language_level'] unless first_time
 
         # check cookies size
@@ -77,9 +79,17 @@ module LyricLab
             view_recommendations_by_difficulty[-1] = Views::SongsList.new(view_recommendations_by_difficulty.last)
           end
         end
+
+        current_level = session[:lang_difficulty] || 'beginner'
+        
         
         view 'home',
-             locals: { recommendations_by_difficulty: view_recommendations_by_difficulty, song_history: viewable_search_history, first_time: }
+             locals: { 
+              recommendations_by_difficulty: view_recommendations_by_difficulty, 
+              song_history: viewable_search_history, 
+              first_time:first_time,
+              current_level: current_level }
+
       rescue StandardError => e
         App.logger.error(e)
         flash[:error] = MSG_ERROR
@@ -89,8 +99,12 @@ module LyricLab
       routing.on 'update_language_level' do
         routing.post do
           request_payload = JSON.parse(routing.body.read)
-          session['language_level'] = request_payload['language_level']
-          { status: 'success', language_level: session['language_level'] }.to_json
+          session[:lang_difficulty] = request_payload['language_level']
+          
+          response.status = 200
+          { status: 'success',
+           language_level: session[:lang_difficulty],
+          redirect_url:'/' }.to_json
         end
       end
 
@@ -162,6 +176,8 @@ module LyricLab
               session[:search_history] << vocabulary_song.origin_id
             end
 
+            current_lang_level = session[:lang_difficulty]
+            viewable_vocabulary = Views::Vocabulary.new(vocabulary_song, current_lang_level)
             viewable_song = Views::Song.new(vocabulary_song)
 
             # Only use browser caching in production
@@ -170,7 +186,10 @@ module LyricLab
             end
 
             # Show viewer the song
-            view 'song', locals: { song: viewable_song }
+            view 'song', locals: { 
+              vocabulary: viewable_vocabulary,  
+              song: viewable_song,          
+              current_lang_level: current_lang_level || 'beginner' }
           rescue StandardError => e
             App.logger.error(e)
             flash[:error] = MSG_NO_VOCABULARY

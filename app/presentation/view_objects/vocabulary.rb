@@ -14,16 +14,21 @@ module Views
       5 => 'Master'
     }.freeze
 
-    DEFAULT_CHECKED_LEVELS = {
-      1 => %w[beginner novice1 novice2],           # Beginner
-      2 => %w[novice2 level1 level2],              # Intermediate
-      3 => %w[level2 level3 level4],               # Advanced
-      4 => %w[level3 level4 level5],               # Expert
-      5 => %w[level4 level5]                       # Master
+    LANG_TO_VOCAB_LEVELS = {
+      'beginner' => %w[beginner novice1 novice2],
+      'intermediate' => %w[novice2 level1 level2],
+      'advanced' => %w[level2 level3 level4],
+      'expert' => %w[level3 level4 level5],
+      'master' => %w[level4 level5]                       
     }.freeze
 
-    def initialize(vocabulary)
+    attr_reader :current_lang_level
+
+    def initialize(vocabulary, current_lang_level = nil)
       @vocabulary = vocabulary
+      @current_lang_level = current_lang_level
+      
+      # @current_lang_level = 'beginner' unless LANG_TO_VOCAB_LEVELS.key?(@current_lang_level)
     end
 
     def sep_text
@@ -81,7 +86,11 @@ module Views
     end
 
     def level_checked?(level)
-      default_checked_levels.include?(level.to_s)
+      return false unless level && @current_lang_level
+
+      levels = LANG_TO_VOCAB_LEVELS[@current_lang_level]
+      return false unless levels
+      levels&.include?(level.to_s) 
     end
   end
 end

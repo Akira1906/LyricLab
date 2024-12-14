@@ -1,3 +1,4 @@
+/ = include 'welcome'
 .container
 
   / Language Level Modal
@@ -47,110 +48,130 @@
         .text-center
           h2.mb-4 Top Songs
         .d-flex
-          .nav.nav-pills.flex-column.me-3 style="min-width: 100px; "
-            / - difficulty_ranges = { beginner: (0..1.5), intermediate: (1.5..3.5), advanced: (3.5..5.0), expert: (5.0..6.0), master: (6.0..7.0) }
+          .nav.nav-pills.flex-column.me-3 style="min-width: 100px;"
             .nav-item
-              a.nav-link.active.success.py-1 data-bs-toggle="pill" href="#beginner" Beginner
+              a.nav-link class=["py-1", current_level == "beginner" ? 'active' : ''] style="color: #198754;" data-bs-toggle="pill" href="#beginner" Beginner
             .nav-item
-              a.nav-link.warning.py-1 data-bs-toggle="pill" href="#intermediate" Intermediate
+              a.nav-link class=["py-1", current_level == "intermediate" ? 'active' : ''] style="color: #fd7e14;" data-bs-toggle="pill" href="#intermediate" Intermediate
             .nav-item
-              a.nav-link.warning.py-1 data-bs-toggle="pill" href="#advanced" Advanced
+              a.nav-link class=["py-1", current_level == "advanced" ? 'active' : ''] style="color: #fd7e14;" data-bs-toggle="pill" href="#advanced" Advanced
             .nav-item
-              a.nav-link.danger.py-1 data-bs-toggle="pill" href="#expert" Expert
+              a.nav-link class=["py-1", current_level == "expert" ? 'active' : ''] style="color: #dc3545;" data-bs-toggle="pill" href="#expert" Expert
             .nav-item
-              a.nav-link.danger.py-1 data-bs-toggle="pill" href="#master" Master
+              a.nav-link class=["py-1", current_level == "master" ? 'active' : ''] style="color: #dc3545;" data-bs-toggle="pill" href="#master" Master
+          
                 
-
           .tab-content
-            .tab-pane.fade id="beginner" class=('show active')
-              .table-responsive style="min-height: 300px;"
-                table.table.table-hover style="min-width: 600px;"
-                  thead
-                    tr
-                      th style="width: 80px;"
-                      th style="width: 250px;" Title
-                      th style="width: 250px;" Artist
-                  tbody
-                    - recommendations_by_difficulty[0].each do |song|
+            - difficulty_mapping = { "beginner" => 0, "intermediate" => 1, "advanced" => 2, "expert" => 3, "master" => 4 }
+            - %w[beginner intermediate advanced expert master].each do |level|
+              .tab-pane.fade id=level class=("show active" if level == current_level)
+                .table-responsive style="min-height: 300px;"
+                  table.table.table-hover style="min-width: 600px;"
+                    thead
                       tr
-                        td 
-                          a href=song.result_link
-                            button.recommendation-button
-                              i class="fa-regular fa-eye"
-                        td.font-weight-bold= song.title
-                        td.font-weight-bold= song.artist
+                        th style="width: 80px;"
+                        th style="width: 250px;" Title
+                        th style="width: 250px;" Artist
+                    tbody
+                      - recommendations_by_difficulty[difficulty_mapping[level]].each do |song|
+                        tr
+                          td 
+                            a href=song.result_link
+                              button.recommendation-button
+                                i class="fa-regular fa-eye"
+                          td.font-weight-bold= song.title
+                          td.font-weight-bold= song.artist
 
-            .tab-pane.fade id="intermediate"
-              .table-responsive style="min-height: 300px;"
-                table.table.table-hover style="min-width: 600px;"
-                  thead
-                    tr
-                      th style="width: 80px;"
-                      th style="width: 250px;" Title
-                      th style="width: 250px;" Artist
-                  tbody
-                    - recommendations_by_difficulty[1].each do |song|
-                      tr
-                        td 
-                          a href=song.result_link
-                            button.recommendation-button
-                              i class="fa-regular fa-eye"
-                        td.font-weight-bold= song.title
-                        td.font-weight-bold= song.artist
+          / .tab-content
+          /   .tab-pane.fade id="beginner" class=('show active')
+          /     .table-responsive style="min-height: 300px;"
+          /       table.table.table-hover style="min-width: 600px;"
+          /         thead
+          /           tr
+          /             th style="width: 80px;"
+          /             th style="width: 250px;" Title
+          /             th style="width: 250px;" Artist
+          /         tbody
+          /           - recommendations_by_difficulty[0].each do |song|
+          /             tr
+          /               td 
+          /                 a href=song.result_link
+          /                   button.recommendation-button
+          /                     i class="fa-regular fa-eye"
+          /               td.font-weight-bold= song.title
+          /               td.font-weight-bold= song.artist
 
-            .tab-pane.fade id="advanced"
-              .table-responsive style="min-height: 300px;"
-                table.table.table-hover style="min-width: 600px;"
-                  thead
-                    tr
-                      th style="width: 80px;"
-                      th style="width: 250px;" Title
-                      th style="width: 250px;" Artist
-                  tbody
-                    - recommendations_by_difficulty[2].each do |song|
-                      tr
-                        td 
-                          a href=song.result_link
-                            button.recommendation-button
-                              i class="fa-regular fa-eye"
-                        td.font-weight-bold= song.title
-                        td.font-weight-bold= song.artist
+          /   .tab-pane.fade id="intermediate"
+          /     .table-responsive style="min-height: 300px;"
+          /       table.table.table-hover style="min-width: 600px;"
+          /         thead
+          /           tr
+          /             th style="width: 80px;"
+          /             th style="width: 250px;" Title
+          /             th style="width: 250px;" Artist
+          /         tbody
+          /           - recommendations_by_difficulty[1].each do |song|
+          /             tr
+          /               td 
+          /                 a href=song.result_link
+          /                   button.recommendation-button
+          /                     i class="fa-regular fa-eye"
+          /               td.font-weight-bold= song.title
+          /               td.font-weight-bold= song.artist
 
-            .tab-pane.fade id="expert"
-              .table-responsive style="min-height: 300px;"
-                table.table.table-hover style="min-width: 600px;"
-                  thead
-                    tr
-                      th style="width: 80px;"
-                      th style="width: 250px;" Title
-                      th style="width: 250px;" Artist
-                  tbody
-                    - recommendations_by_difficulty[3].each do |song|
-                      tr
-                        td 
-                          a href=song.result_link
-                            button.recommendation-button
-                              i class="fa-regular fa-eye"
-                        td.font-weight-bold= song.title
-                        td.font-weight-bold= song.artist
+          /   .tab-pane.fade id="advanced"
+          /     .table-responsive style="min-height: 300px;"
+          /       table.table.table-hover style="min-width: 600px;"
+          /         thead
+          /           tr
+          /             th style="width: 80px;"
+          /             th style="width: 250px;" Title
+          /             th style="width: 250px;" Artist
+          /         tbody
+          /           - recommendations_by_difficulty[2].each do |song|
+          /             tr
+          /               td 
+          /                 a href=song.result_link
+          /                   button.recommendation-button
+          /                     i class="fa-regular fa-eye"
+          /               td.font-weight-bold= song.title
+          /               td.font-weight-bold= song.artist
 
-            .tab-pane.fade id="master"
-              .table-responsive style="min-height: 300px;"
-                table.table.table-hover style="min-width: 600px;"
-                  thead
-                    tr
-                      th style="width: 80px;"
-                      th style="width: 250px;" Title
-                      th style="width: 250px;" Artist
-                  tbody
-                    - recommendations_by_difficulty[4].each do |song|
-                      tr
-                        td 
-                          a href=song.result_link
-                            button.recommendation-button
-                              i class="fa-regular fa-eye"
-                        td.font-weight-bold= song.title
-                        td.font-weight-bold= song.artist
+          /   .tab-pane.fade id="expert"
+          /     .table-responsive style="min-height: 300px;"
+          /       table.table.table-hover style="min-width: 600px;"
+          /         thead
+          /           tr
+          /             th style="width: 80px;"
+          /             th style="width: 250px;" Title
+          /             th style="width: 250px;" Artist
+          /         tbody
+          /           - recommendations_by_difficulty[3].each do |song|
+          /             tr
+          /               td 
+          /                 a href=song.result_link
+          /                   button.recommendation-button
+          /                     i class="fa-regular fa-eye"
+          /               td.font-weight-bold= song.title
+          /               td.font-weight-bold= song.artist
+
+          /   .tab-pane.fade id="master"
+          /     .table-responsive style="min-height: 300px;"
+          /       table.table.table-hover style="min-width: 600px;"
+          /         thead
+          /           tr
+          /             th style="width: 80px;"
+          /             th style="width: 250px;" Title
+          /             th style="width: 250px;" Artist
+          /         tbody
+          /           - recommendations_by_difficulty[4].each do |song|
+          /             tr
+          /               td 
+          /                 a href=song.result_link
+          /                   button.recommendation-button
+          /                     i class="fa-regular fa-eye"
+          /               td.font-weight-bold= song.title
+          /               td.font-weight-bold= song.artist
 
       - if song_history.any?
         .col-md-4
