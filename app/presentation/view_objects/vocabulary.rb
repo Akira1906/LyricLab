@@ -14,7 +14,6 @@ module Views
       5 => 'Master'
     }.freeze
 
-    
     DEFAULT_CHECKED_LEVELS = {
       1 => %w[beginner novice1 novice2],           # Beginner
       2 => %w[novice2 level1 level2],              # Intermediate
@@ -57,7 +56,7 @@ module Views
       unique_words.map(&:characters).sort_by(&:length).reverse.each do |word|
         marked_text.gsub!(word, "\\@#{word}\\$")
       end
-      puts "text: #{marked_text}"
+      # puts "text: #{marked_text}"
       marked_text
     end
 
@@ -67,7 +66,7 @@ module Views
 
     def language_difficulty
       return 0 if @vocabulary.language_difficulty.nil?
-      
+
       case @vocabulary.language_difficulty
       when 0..1.5 then 1    # Beginner
       when 1.5..3.5 then 2  # Intermediate
@@ -84,6 +83,5 @@ module Views
     def level_checked?(level)
       default_checked_levels.include?(level.to_s)
     end
-
   end
 end

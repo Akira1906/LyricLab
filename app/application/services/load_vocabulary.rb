@@ -30,9 +30,9 @@ module LyricLab
       end
 
       def reify_vocabulary(input)
-        puts "input[:response].payload: #{input[:response].payload}"
+        # puts "input[:response].payload: #{input[:response].payload}"
         unless input[:response].processing?
-          puts 'vocabulary already processed'
+          # puts 'vocabulary already processed'
           Representer::Song.new(OpenStruct.new) # rubocop:disable Style/OpenStructUse
             .from_json(input[:response].payload)
             .then { input[:vocabulary_song] = _1 }
