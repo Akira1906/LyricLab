@@ -57,7 +57,7 @@ module LyricLab
 
         # List_recommendations
         def list_targeted_recommendations(language_difficulty)
-          call_api('get', ['recommendations','targeted'], 'language_difficulty' => language_difficulty)
+          call_api('get', %w[recommendations targeted], 'language_difficulty' => language_difficulty)
         end
 
         def list_recommendations
@@ -95,7 +95,7 @@ module LyricLab
         def call_api(method, resources = [], params = {})
           api_path = resources.empty? ? @api_host : @api_root
           url = [api_path, resources].flatten.join('/') + params_str(params)
-          puts "Call API:#{url}"
+          puts "Call API(#{method}):#{url}"
           HTTP.headers('Accept' => 'application/json').send(method, url)
             .then { |http_response| Response.new(http_response) }
         rescue StandardError

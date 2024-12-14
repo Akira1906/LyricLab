@@ -83,16 +83,16 @@ module LyricLab
         end
         puts "viewable_recommendations_all_difficulties: #{viewable_recommendations_all_difficulties.inspect}"
 
-        viewable_recommendations = Service::ListRecommendations.new.call
-        if viewable_recommendations.failure?
-          flash.now[:error] = MSG_NO_RECOMMENDATIONS
-          viewable_recommendations = []
-        else
-          viewable_recommendations = viewable_recommendations.value!.recommendations
-          flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if viewable_recommendations.none?
-          viewable_recommendations = Views::SongsList.new(viewable_recommendations)
-        end
-
+        # viewable_recommendations = Service::ListRecommendations.new.call
+        # if viewable_recommendations.failure?
+        #   flash.now[:error] = MSG_NO_RECOMMENDATIONS
+        #   viewable_recommendations = []
+        # else
+        #   viewable_recommendations = viewable_recommendations.value!.recommendations
+        #   flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if viewable_recommendations.none?
+        #   viewable_recommendations = Views::SongsList.new(viewable_recommendations)
+        # end
+        viewable_recommendations = []
         # response.expires 60, public: true
         # puts "Recommendations: #{viewable_recommendations.inspect}, Search History: #{viewable_search_history.inspect}"
         view 'home',
@@ -146,13 +146,9 @@ module LyricLab
           end
         end
 
-        # GET /result/{spotify_id}
+        # GET /search/result/{spotify_id}
         routing.on 'result', String do |origin_id|
           routing.get do
-            record_result = Service::RecordRecommendation.new.call(origin_id)
-            # The system should still work if the recording fails
-            flash.now[:error] = MSG_ERROR_RECORD_RECOMMENDATIONS if record_result.failure?
-
             result = Service::LoadVocabulary.new.call(
               origin_id: origin_id
             )
@@ -161,14 +157,15 @@ module LyricLab
               flash[:error] = result.failure
               raise result.failure
             end
-
             vocabulary_song = OpenStruct.new(result.value!)
             if vocabulary_song.response.processing?
               flash[:notice] = 'Vocabulary Information for the song is being generated, ' \
                                'please check back in a moment(~1 min).'
               routing.redirect request.referer || '/'
             end
-
+            record_result = Service::RecordRecommendation.new.call(origin_id)
+            # The system should still work if the recording fails
+            flash.now[:error] = MSG_ERROR_RECORD_RECOMMENDATIONS if record_result.failure?
             vocabulary_song = vocabulary_song.vocabulary_song
             unless session[:search_history].include?(vocabulary_song.origin_id)
               session[:search_history] << vocabulary_song.origin_id
