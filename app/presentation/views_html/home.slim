@@ -1,4 +1,3 @@
-
 .container
   form#search-song-form role="form" action="/search" method="POST"
     .row.justify-content-center.align-items-center.my-4
@@ -7,73 +6,121 @@
       .col-md-2.col-sm-3.text-center
         button#song-search-submit.btn.btn-success type="submit" search
 
-  hr.mb-4
+        / TODO: after adding popup logic should remove
+        / button.btn.btn-primary type="button" data-bs-toggle="modal" data-bs-target="#welcome-modal"
+        / | Test Modal
 
-  - if recommendations.any?
+    hr.mb-4
+  - if recommendations_by_difficulty.any?
     .row
       .col-md-8
         .text-center
           h2.mb-4 Top Songs
         .d-flex
           .nav.nav-pills.flex-column.me-3 style="min-width: 100px; "
+            / - difficulty_ranges = { beginner: (0..1.5), intermediate: (1.5..3.5), advanced: (3.5..5.0), expert: (5.0..6.0), master: (6.0..7.0) }
             .nav-item
-              a.nav-link.active.success.py-1 data-toggle="tab" href="#beginner" Beginner
+              a.nav-link.active.success.py-1 data-bs-toggle="pill" href="#beginner" Beginner
             .nav-item
-              a.nav-link.warning.py-1 data-toggle="tab" href="#intermediate" Intermediate
+              a.nav-link.warning.py-1 data-bs-toggle="pill" href="#intermediate" Intermediate
             .nav-item
-              a.nav-link.warning.py-1 data-toggle="tab" href="#advanced" Advanced
+              a.nav-link.warning.py-1 data-bs-toggle="pill" href="#advanced" Advanced
             .nav-item
-              a.nav-link.danger.py-1 data-toggle="tab" href="#expert" Expert
+              a.nav-link.danger.py-1 data-bs-toggle="pill" href="#expert" Expert
             .nav-item
-              a.nav-link.danger.py-1 data-toggle="tab" href="#master" Master
+              a.nav-link.danger.py-1 data-bs-toggle="pill" href="#master" Master
                 
 
-          .tab-content.ms-0.flex-grow-1
-            .tab-pane.fade.show.active#overall
+          .tab-content
+            .tab-pane.fade id="beginner" class=('show active')
               .table-responsive style="min-height: 300px;"
-                table class="table table-hover" id="recommendations_table"
+                table.table.table-hover style="min-width: 600px;"
                   thead
                     tr
-                      th style="width: 50px;padding-left: 3rem;"
-                      th style="width :80px;"Title
-                      th style="width :80px;"Artist
+                      th style="width: 80px;"
+                      th style="width: 250px;" Title
+                      th style="width: 250px;" Artist
                   tbody
-                    - row_count = 0
-                    - recommendations.each do |song|
+                    - recommendations_by_difficulty[0].each do |song|
                       tr
-                        td style="padding-left: 1rem;"
+                        td 
                           a href=song.result_link
                             button.recommendation-button
                               i class="fa-regular fa-eye"
-                        td.font-weight-bold = song.title
-                        td.font-weight-bold = song.artist
-                     
+                        td.font-weight-bold= song.title
+                        td.font-weight-bold= song.artist
 
-            / TODO:add language skill logic
-            / Beginner（1-3）
-            / Intermediate（2-4）
-            / Advanced（3-5）
-            / Expert（4-6）
-            / Master（5-7）
-            .tab-pane.fade#listening
+            .tab-pane.fade id="intermediate"
               .table-responsive style="min-height: 300px;"
-                table class="table table-hover" id="listening_recommendations"
-              
+                table.table.table-hover style="min-width: 600px;"
+                  thead
+                    tr
+                      th style="width: 80px;"
+                      th style="width: 250px;" Title
+                      th style="width: 250px;" Artist
+                  tbody
+                    - recommendations_by_difficulty[1].each do |song|
+                      tr
+                        td 
+                          a href=song.result_link
+                            button.recommendation-button
+                              i class="fa-regular fa-eye"
+                        td.font-weight-bold= song.title
+                        td.font-weight-bold= song.artist
 
-            .tab-pane.fade#speaking
+            .tab-pane.fade id="advanced"
               .table-responsive style="min-height: 300px;"
-                table class="table table-hover" id="speaking_recommendations"
-              
+                table.table.table-hover style="min-width: 600px;"
+                  thead
+                    tr
+                      th style="width: 80px;"
+                      th style="width: 250px;" Title
+                      th style="width: 250px;" Artist
+                  tbody
+                    - recommendations_by_difficulty[2].each do |song|
+                      tr
+                        td 
+                          a href=song.result_link
+                            button.recommendation-button
+                              i class="fa-regular fa-eye"
+                        td.font-weight-bold= song.title
+                        td.font-weight-bold= song.artist
 
-            .tab-pane.fade#reading
+            .tab-pane.fade id="expert"
               .table-responsive style="min-height: 300px;"
-                table class="table table-hover" id="reading_recommendations"
-  
+                table.table.table-hover style="min-width: 600px;"
+                  thead
+                    tr
+                      th style="width: 80px;"
+                      th style="width: 250px;" Title
+                      th style="width: 250px;" Artist
+                  tbody
+                    - recommendations_by_difficulty[3].each do |song|
+                      tr
+                        td 
+                          a href=song.result_link
+                            button.recommendation-button
+                              i class="fa-regular fa-eye"
+                        td.font-weight-bold= song.title
+                        td.font-weight-bold= song.artist
 
-            .tab-pane.fade#writing
+            .tab-pane.fade id="master"
               .table-responsive style="min-height: 300px;"
-                table class="table table-hover" id="writing_recommendations"
-
+                table.table.table-hover style="min-width: 600px;"
+                  thead
+                    tr
+                      th style="width: 80px;"
+                      th style="width: 250px;" Title
+                      th style="width: 250px;" Artist
+                  tbody
+                    - recommendations_by_difficulty[4].each do |song|
+                      tr
+                        td 
+                          a href=song.result_link
+                            button.recommendation-button
+                              i class="fa-regular fa-eye"
+                        td.font-weight-bold= song.title
+                        td.font-weight-bold= song.artist
 
       - if song_history.any?
         .col-md-4
@@ -96,31 +143,25 @@
                       td.font-weight-bold= song.title
                       td.font-weight-bold= song.artist
 
-  / Language Level Modal
-  .modal.fade#languageModal tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true"
-    .modal-dialog
-      .modal-content
-        .modal-header
-          h5.modal-title#languageModalLabel Select Your Language Level
-          button.btn-close type="button" data-bs-dismiss="modal" aria-label="Close"
-        .modal-body
-          p Please choose your language level to get started.
-          form action="/" method="GET"
-            select#proficiency-level.form-select.form-select-lg.mb-4 name="language_level"
-              option value="" selected="selected" disabled=true Choose your level...
-              option value="beginner" Beginner
-              option value="intermediate" Intermediate
-              option value="advanced" Advanced
-              option value="expert" Expert
-              option value="master" Master
-            button.btn.btn-success type="submit" Submit
-
-  / Include Bootstrap JS and modal activation script
-  / script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
-
-  - if first_time
-    script
-      | document.addEventListener('DOMContentLoaded', () => {
-      |   const modal = new bootstrap.Modal(document.getElementById('languageModal'));
-      |   modal.show();
-      | });
+javascript:
+  document.addEventListener('DOMContentLoaded', function() {
+      const pills = document.querySelectorAll('.nav-link');
+      
+      pills.forEach(pill => {
+        pill.addEventListener('click', function(e) {
+          pills.forEach(p => p.classList.remove('active'));
+          
+          this.classList.add('active');
+          
+          const targetId = this.getAttribute('href').substring(1);
+          document.querySelectorAll('.tab-pane').forEach(pane => {
+            pane.classList.remove('show', 'active');
+          });
+          
+          const targetPane = document.getElementById(targetId);
+          if (targetPane) {
+            targetPane.classList.add('show', 'active');
+          }
+        });
+      });
+    });

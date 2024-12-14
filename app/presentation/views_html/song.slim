@@ -15,16 +15,7 @@
           
             div style="width: 350px;"
               .cover-container.mb-3
-                img.img-fluid.rounded-3.w-100 src="#{song.cover_image_url_medium}" alt="Album Cover" style="object-fit: cover;"
-              / - if song.respond_to?(:preview_url) && !song.preview_url.nil?
-              /   p.text-success Preview URL is available
-              /   .audio-container.mb-3
-              /     audio.w-100 controls=true
-              /       source src="#{song.preview_url}" type="audio/mpeg"
-              / - else
-              /   p.text-danger 
-              /     | Preview URL not available 
-              /     = "(respond_to?: #{song.respond_to?(:preview_url)})"              
+                img.img-fluid.rounded-3.w-100 src="#{song.cover_image_url_medium}" alt="Album Cover" style="object-fit: cover;"            
             
             .song-info-container.pt-2 style="width: 350px;"
               h2.display-4.mb-3
@@ -40,13 +31,15 @@
                     .text-uppercase.text-muted.small.mb-1 Popularity
                     .h5.mb-0.d-flex.align-items-center
                       i.fas.fa-fire.text-warning.me-2
-                      = song.popularity
+                      = "#{song.popularity}/100"
 
                 div.mb-3
-                  .text-uppercase.text-muted.small.mb-1 Language Level
+                  .text-uppercase.text-muted.small.mb-1 
+                    | Language Level 
+                    / span.ms-2.badge style="background-color: #{song.vocabulary.difficulty_color}"
+                    /   = song.vocabulary.difficulty_text
                   .h5.mb-0.d-flex.align-items-center
-                    / TODO: add language level show up icon
-                    - level = 3  
+                    - level = song.vocabulary.language_difficulty
                     - 5.times do |i|
                       - if i < level
                         i.fas.fa-star.text-warning.me-1
