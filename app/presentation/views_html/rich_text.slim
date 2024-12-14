@@ -5,8 +5,8 @@
 
     - if vocabulary.respond_to?(:song) && vocabulary.song&.respond_to?(:origin_id)
       - spotify_url = "https://open.spotify.com/track/#{vocabulary.song.origin_id}"
-      a.btn.d-inline-flex.align-items-center href=spotify_url target="_blank" style="background-color: #1DB954; color: white; border-radius: 500px; padding: 7px 15px; font-size: 14px; text-decoration: none; transition: all 0.2s ease;"
-        i.fab.fa-spotify style="font-size: 16px; margin-right: 6px;"
+      a.btn.d-inline-flex.align-items-center.spotify-button href=spotify_url target="_blank"
+        i.fab.fa-spotify
         span Listen on Spotify
 
   .level-button-container
@@ -38,17 +38,14 @@
         input type="checkbox" id="level5Check" checked=vocabulary.level_checked?('level5')
         label.ms-2 for="level5Check" Level 5
 
-.lyrics.p-4 style="font-size: 1.2rem;"
+.lyrics.p-4
   - if vocabulary.respond_to?(:raw_text) && vocabulary.raw_text && vocabulary.marked_text
     - lines = vocabulary.marked_text.split("\n")
-    - puts "Vocabulary Words:#{vocabulary.unique_words.map(&:characters)}"
     - lines.each do |line|
-      .line.mb-3 style="letter-spacing: -1px; line-height: 1.1;"
-        - puts "splitted lines#{line.split}"
+      .line.mb-3
         - left = 0
         - in_marked_word = 0
         - for right in 0..line.length
-          - print(line[right])
           - if line[right] == '\\' && line[right + 1] == '@' && in_marked_word == 0
             - if left < right
               - word = line[left...right].gsub(/[\\@$]/, '')
@@ -56,17 +53,12 @@
               span.word-space<> = " "
             - left = right + 2
           - if line[right] == '\\' && line[right + 1] == '$' && in_marked_word == 1
-            - puts "pointer area: #{line[left...right]}"
             - word = line[left...right].gsub(/[\\@$]/, '')
             - left = right + 2
-            - puts "in_marked_word: #{in_marked_word}"
-            - puts "word: #{word}"
             - unique_word = vocabulary.unique_words.find { |w| w.characters == word }
             - if unique_word
-              - puts "found unique_word: #{unique_word.characters}"
               span[
-                class="#{unique_word.language_level} cursor-pointer vocabulary-word"
-                style="cursor: pointer;"
+                class="vocabulary-word cursor-pointer"
                 onclick="handleWordClick(this)"
                 data-word=unique_word.characters
                 data-translation=unique_word.translation
@@ -74,6 +66,7 @@
                 data-definition=unique_word.definition
                 data-example=unique_word.example_sentence
                 data-level=unique_word.language_level.gsub('-class', '')
+                data-original-level=unique_word.language_level
               ] = "#{word} "
               span.word-space<> = " "
             - else 
@@ -86,6 +79,7 @@
         - word = line[left...line.length].gsub(/[\\@$]/, '')
         span = word
         span.word-space<> = " "
+
 javascript:
   function toggleLevelDropdown(event) {
     if (!event) event = window.event;
@@ -94,11 +88,9 @@ javascript:
     dropdown.classList.toggle("show");
   }
 
-
   document.getElementById('levelDropdown').addEventListener('click', function(event) {
     event.stopPropagation();
   });
-
 
   document.addEventListener('click', function(event) {
     const dropdowns = document.getElementsByClassName("level-dropdown-content");
@@ -109,22 +101,15 @@ javascript:
     }
   });
 
-
   document.addEventListener('DOMContentLoaded', function() {
     const checkboxes = document.querySelectorAll('.level-checkbox input');
-    
-
     updateActiveWords();
-    
     
     for (let checkbox of checkboxes) {
       checkbox.addEventListener('change', function() {
         const level = this.id.replace('Check', '');
-        
-    
         updateActiveWords();
         
-      
         const cards = document.querySelectorAll('.word-card');
         for (let card of cards) {
           const levelSpan = card.querySelector(`span[class*="${level}-class"]`);
@@ -136,30 +121,30 @@ javascript:
     }
   });
 
-
   function updateActiveWords() {
     const allWords = document.querySelectorAll('.vocabulary-word');
     
-  
     allWords.forEach(word => {
       word.classList.remove('active-level');
       word.classList.add('word-hidden');
+      // 移除所有等級相關的 class
+      word.className = word.className.split(' ').filter(cls => 
+        !cls.includes('-class') && cls !== 'active-level'
+      ).join(' ') + ' vocabulary-word word-hidden';
     });
     
-
     const checkedLevels = Array.from(document.querySelectorAll('.level-checkbox input:checked'))
       .map(checkbox => checkbox.id.replace('Check', ''));
     
-  
     checkedLevels.forEach(level => {
       const levelWords = document.querySelectorAll(`.vocabulary-word[data-level="${level}"]`);
       levelWords.forEach(word => {
         word.classList.add('active-level');
         word.classList.remove('word-hidden');
+        word.classList.add(`${level}-class`);
       });
     });
   }
-
 
   function handleWordClick(element) {
     if (element.classList.contains('word-hidden') || !element.classList.contains('active-level')) {

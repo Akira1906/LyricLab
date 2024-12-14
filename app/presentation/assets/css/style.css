@@ -437,19 +437,88 @@ span.level5-class {
   transition: all 0.3s ease;
 }
 
-/* 默认隐藏所有单词的颜色 */
 .vocabulary-word {
   color: inherit !important;
   background-color: transparent !important;
 }
 
-/* 当对应level被选中时才显示颜色 */
 .vocabulary-word.active-level {
-  color: inherit; /* 使用原本定义的颜色 */
+  color: inherit;
 }
 
 .word-hidden {
   color: inherit !important;
   background-color: transparent !important;
   cursor: default !important;
+}
+
+.vocabulary-word.active-level.beginner-class {
+  color: #43aa8b !important;
+}
+.vocabulary-word.active-level.novice1-class {
+  color: #90be6d !important;
+}
+.vocabulary-word.active-level.novice2-class {
+  color: #f9c74f !important;
+}
+.vocabulary-word.active-level.level1-class {
+  color: #f9844a !important;
+}
+.vocabulary-word.active-level.level2-class {
+  color: #f8961e !important;
+}
+.vocabulary-word.active-level.level3-class {
+  color: #f3722c !important;
+}
+.vocabulary-word.active-level.level4-class {
+  color: #f94144 !important;
+}
+.vocabulary-word.active-level.level5-class {
+  color: #9b2518 !important;
+}
+
+.lyrics {
+  font-size: 1.2rem;
+  padding: 1rem;
+}
+
+.line {
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+.table-responsive {
+  margin: 0 20px;
+}
+
+.recommendation-button {
+  border: none;
+  background: none;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.difficulty-tab {
+  cursor: pointer;
+}
+
+.table {
+  margin-bottom: 0;
+}
+
+.nav-pills .nav-link {
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  margin-bottom: 4px;
+}
+
+.nav-pills .nav-link:not(.active):hover {
+  background-color: rgba(240, 240, 240, 0.5);
+}
+
+.nav-pills .nav-link.active {
+  background-color: #f0f0f0 !important;
+  font-weight: 500;
+  border-left: 3px solid currentColor;
 }

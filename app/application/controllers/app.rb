@@ -52,33 +52,33 @@ module LyricLab
         # TODO: get recommendations for each language_level from the API
         language_difficulties = [1,3,4,5,7]
         # this is gonna be a list of song metadata lists
-        viewable_recommendations_all_difficulties = []
+        view_recommendations_by_difficulty = []
         language_difficulties.each do |language_difficulty|
-          viewable_recommendations_all_difficulties.append(Service::ListTargetedRecommendations.new.call(language_difficulty))
-          if viewable_recommendations_all_difficulties[-1].failure?
+          view_recommendations_by_difficulty.append(Service::ListTargetedRecommendations.new.call(language_difficulty))
+          if view_recommendations_by_difficulty.last.failure?
             flash.now[:error] = MSG_NO_RECOMMENDATIONS
-            viewable_recommendations_all_difficulties[-1] = []
+            view_recommendations_by_difficulty.last = []
           else
-            viewable_recommendations_all_difficulties[-1] = viewable_recommendations_all_difficulties[-1].value!.recommendations
-            flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if viewable_recommendations_all_difficulties[-1].none?
-            viewable_recommendations_all_difficulties[-1] = Views::SongsList.new(viewable_recommendations_all_difficulties[-1])
+            view_recommendations_by_difficulty[-1] = view_recommendations_by_difficulty.last.value!.recommendations
+            flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if view_recommendations_by_difficulty.last.none?
+            view_recommendations_by_difficulty[-1] = Views::SongsList.new(view_recommendations_by_difficulty.last)
           end
         end
-        puts "viewable_recommendations_all_difficulties: #{viewable_recommendations_all_difficulties.inspect}"
+        puts "view_recommendations_by_difficulty: #{view_recommendations_by_difficulty.inspect}"
 
-        viewable_recommendations = Service::ListRecommendations.new.call
-        if viewable_recommendations.failure?
-          flash.now[:error] = MSG_NO_RECOMMENDATIONS
-          viewable_recommendations = []
-        else
-          viewable_recommendations = viewable_recommendations.value!.recommendations
-          flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if viewable_recommendations.none?
-          viewable_recommendations = Views::SongsList.new(viewable_recommendations)
-        end
+        # viewable_recommendations = Service::ListRecommendations.new.call
+        # if viewable_recommendations.failure?
+        #   flash.now[:error] = MSG_NO_RECOMMENDATIONS
+        #   viewable_recommendations = []
+        # else
+        #   viewable_recommendations = viewable_recommendations.value!.recommendations
+        #   flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if viewable_recommendations.none?
+        #   viewable_recommendations = Views::SongsList.new(viewable_recommendations)
+        # end
 
         # response.expires 60, public: true
         # puts "Recommendations: #{viewable_recommendations.inspect}, Search History: #{viewable_search_history.inspect}"
-        view 'home', locals: { recommendations: viewable_recommendations, song_history: viewable_search_history }
+        view 'home', locals: { recommendations_by_difficulty: view_recommendations_by_difficulty, song_history: viewable_search_history }
       rescue StandardError => e
         App.logger.error(e)
         flash[:error] = MSG_ERROR

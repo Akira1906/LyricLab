@@ -26,5 +26,9 @@ module Views
     def id
       @recommendation.origin_id
     end
+
+    def cover_image_url_small
+      @recommendation.cover_image_url_small
+    end
   end
 end
