@@ -36,38 +36,16 @@ html
 
     .container id='html_body'
       section
-        .row style="padding-top: 40px; vertical-align: middle;"
-          .col-12
+        .row style="padding-top: 40px; vertical-align: middle; display: flex; position: relative; justify-content: center"
+          .col-md-4 style="justify-self: center;"
             h1
               a href="/" LyricLab
+          .col-md-4 style="position: absolute; right: 0;"
+            == render "dropdown_lang_lvl"
 
       section
         include :flash_bar
         == yield
-
-    / Welcome 
-    #welcome-modal.modal.fade tabindex="-1" role="dialog" aria-labelledby="welcomeModalLabel" aria-hidden="true"
-      .modal-dialog.modal-dialog-centered role="document"
-        .modal-content
-          .modal-header.border-0.pb-0
-            h5#welcomeModalLabel.modal-title.fw-bold Welcome to LyricLab!
-            button.btn-close type="button" data-bs-dismiss="modal" aria-label="Close"
-              span aria-hidden="true" &times;
-
-          .modal-body
-            p.mb-4 Please select your Chinese proficiency level to get started.
-            .form-group
-              / label.form-label.mb-2 for="proficiency-level" Proficiency Level
-              select#proficiency-level.form-select
-                option value="" selected="selected" disabled=true Choose your level...
-                option value="beginner" Beginner
-                option value="intermediate" Intermediate
-                option value="advanced" Advanced
-                option value="expert" Expert
-                option value="master" Master
-
-          .modal-footer
-            button#start-learning.btn.btn-success.px-4 type="button" Let's start learning
 
     footer.mt-5.text-center
       p ="Made for non-commercial purposes"

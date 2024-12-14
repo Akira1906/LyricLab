@@ -83,6 +83,14 @@ module LyricLab
         routing.redirect '/'
       end
 
+      routing.on 'update_language_level' do
+        routing.post do
+          request_payload = JSON.parse(routing.body.read)
+          session['language_level'] = request_payload['language_level']
+          { status: 'success', language_level: session['language_level'] }.to_json
+        end
+      end
+
       routing.on 'search' do # rubocop:disable Metrics/BlockLength
         routing.is do
           # POST /search/
@@ -107,12 +115,9 @@ module LyricLab
         routing.on 'results' do
           # GET /search/results/?i={search_ids}
           routing.get do
-            # puts "before: search_ids: #{routing.params['i']}"
             search_ids = Base64.urlsafe_decode64(routing.params['i'])
-            # puts "search_ids: #{search_ids}"
 
             result = Service::LoadSongsById.new.call(search_ids.split('-'))
-            # puts "results: #{result.inspect}"
             raise result.failure.to_s if result.failure?
 
             search_results = result.value!.songs
