@@ -38,7 +38,7 @@
         input type="checkbox" id="level5Check" checked=vocabulary.level_checked?('level5')
         label.ms-2 for="level5Check" Level 5
 
-.lyrics.p-4
+.lyrics.p-4 style="font-size: 1.2rem;"
   - if vocabulary.respond_to?(:raw_text) && vocabulary.raw_text && vocabulary.marked_text
     - lines = vocabulary.marked_text.split("\n")
     - lines.each do |line|

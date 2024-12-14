@@ -49,7 +49,6 @@ module LyricLab
         session[:first_visit] = false
 
         session[:lang_difficulty] = routing.params['language_level'] unless first_time
-        puts session[:lang_difficulty] unless first_time
 
         # check cookies size
         session_size = session[:search_history].to_json.bytesize
@@ -78,22 +77,9 @@ module LyricLab
             view_recommendations_by_difficulty[-1] = Views::SongsList.new(view_recommendations_by_difficulty.last)
           end
         end
-        puts "view_recommendations_by_difficulty: #{view_recommendations_by_difficulty.inspect}"
-
-        # viewable_recommendations = Service::ListRecommendations.new.call
-        # if viewable_recommendations.failure?
-        #   flash.now[:error] = MSG_NO_RECOMMENDATIONS
-        #   viewable_recommendations = []
-        # else
-        #   viewable_recommendations = viewable_recommendations.value!.recommendations
-        #   flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if viewable_recommendations.none?
-        #   viewable_recommendations = Views::SongsList.new(viewable_recommendations)
-        # end
-
-        # response.expires 60, public: true
-        # puts "Recommendations: #{viewable_recommendations.inspect}, Search History: #{viewable_search_history.inspect}"
+        
         view 'home',
-             locals: { recommendations: viewable_recommendations, song_history: viewable_search_history, first_time: }
+             locals: { recommendations_by_difficulty: view_recommendations_by_difficulty, song_history: viewable_search_history, first_time: }
       rescue StandardError => e
         App.logger.error(e)
         flash[:error] = MSG_ERROR
@@ -115,7 +101,7 @@ module LyricLab
             response.expires 60, public: true
             search_string = Forms::NewSearch.new.call(routing.params)
             search_results = Service::FindSongsFromSearch.new.call(search_string)
-            puts "search_results: #{search_results.inspect}"
+            
             raise search_results.failure if search_results.failure?
 
             songs = search_results.value!.songs
@@ -158,7 +144,7 @@ module LyricLab
             result = Service::LoadVocabulary.new.call(
               origin_id: origin_id
             )
-            puts "result: #{result.inspect}"
+            
             if result.failure?
               flash[:error] = result.failure
               raise result.failure
