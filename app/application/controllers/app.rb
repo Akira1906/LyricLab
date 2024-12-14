@@ -28,7 +28,9 @@ module LyricLab
     MSG_NO_VOCABULARY = 'Can\'t find vocabulary for this song'
     MSG_ERROR_RECORD_RECOMMENDATIONS = 'Can\'t update recommendations based on this action'
     MSG_NO_RECOMMENDATIONS_AVAILABLE = 'No recommendations available yet'
+    MSG_TARGETED_RECOMMENDATIONS_NOT_AVAILABLE = 'For some language difficulties, no recommendations are available'
     MSG_ERROR = 'Something went wrong'
+    MSG_NO_SEARCH_HISTORY = 'No search history available'
 
     route do |routing| # rubocop:disable Metrics/BlockLength
       routing.public
@@ -43,7 +45,7 @@ module LyricLab
       routing.root do
         viewable_search_history = Service::LoadSongsById.new.call(session[:search_history])
         viewable_search_history = if viewable_search_history.failure?
-                                    flash[:error] = MSG_ERROR
+                                    flash[:error] = MSG_NO_SEARCH_HISTORY
                                     []
                                   else
                                     Views::SongsList.new(viewable_search_history.value!.songs)
@@ -84,7 +86,6 @@ module LyricLab
         flash[:error] = MSG_ERROR
         routing.redirect '/'
       end
-
 
       routing.on 'search' do # rubocop:disable Metrics/BlockLength
         routing.is do
