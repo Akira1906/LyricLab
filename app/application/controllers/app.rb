@@ -29,7 +29,7 @@ module LyricLab
     MSG_ERROR_SEARCH_RESULTS = 'Can\'t find these search results'
     MSG_NO_VOCABULARY = 'Can\'t find vocabulary for this song'
     MSG_ERROR_RECORD_RECOMMENDATIONS = 'Can\'t update recommendations based on this action'
-    MSG_NO_RECOMMENDATIONS_AVAILABLE = 'No recommendations available yet'
+    MSG_NO_RECOMMENDATIONS_AVAILABLE = 'Recommendations are not yet available for all language difficulties'
     MSG_TARGETED_RECOMMENDATIONS_NOT_AVAILABLE = 'For some language difficulties, no recommendations are available'
     MSG_ERROR = 'Something went wrong'
     MSG_COOKIE = 'Couldn\'t load search history'
@@ -63,7 +63,7 @@ module LyricLab
                                   end
 
         # TODO: get recommendations for each language_level from the API
-        language_difficulties = [1,3,4,5,7]
+        language_difficulties = [1, 3, 4, 5, 7]
         # this is gonna be a list of song metadata lists
         view_recommendations_by_difficulty = []
         language_difficulties.each do |language_difficulty|
@@ -77,9 +77,10 @@ module LyricLab
             view_recommendations_by_difficulty[-1] = Views::SongsList.new(view_recommendations_by_difficulty.last)
           end
         end
-        
+
         view 'home',
-             locals: { recommendations_by_difficulty: view_recommendations_by_difficulty, song_history: viewable_search_history, first_time: }
+             locals: { recommendations_by_difficulty: view_recommendations_by_difficulty,
+song_history: viewable_search_history, first_time: }
       rescue StandardError => e
         App.logger.error(e)
         flash[:error] = MSG_ERROR
@@ -101,7 +102,7 @@ module LyricLab
             response.expires 60, public: true
             search_string = Forms::NewSearch.new.call(routing.params)
             search_results = Service::FindSongsFromSearch.new.call(search_string)
-            
+
             raise search_results.failure if search_results.failure?
 
             songs = search_results.value!.songs
@@ -144,7 +145,7 @@ module LyricLab
             result = Service::LoadVocabulary.new.call(
               origin_id: origin_id
             )
-            
+
             if result.failure?
               flash[:error] = result.failure
               raise result.failure
