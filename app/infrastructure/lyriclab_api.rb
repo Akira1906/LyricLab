@@ -57,7 +57,7 @@ module LyricLab
 
         # List_recommendations
         def list_targeted_recommendations(language_difficulty)
-          call_api('get', ['recommendations','targeted'], 'language_difficulty' => language_difficulty)
+          call_api('get', %w[recommendations targeted], 'language_difficulty' => language_difficulty)
         end
 
         def list_recommendations

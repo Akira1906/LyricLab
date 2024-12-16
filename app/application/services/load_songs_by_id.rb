@@ -17,6 +17,7 @@ module LyricLab
 
       def get_songs(ids)
         return Failure(MSG_NO_SONGS) if ids.empty?
+
         result = Gateway::Api.new(LyricLab::App.config)
           .load_songs(ids.join('-'))
         Failure(MSG_NO_SONGS) if result.failure?

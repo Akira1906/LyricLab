@@ -24,12 +24,11 @@ module LyricLab
     MAX_SESSION_SIZE = 4096 # to control for cookies size
 
     # Flash messages
-    MSG_NO_RECOMMENDATIONS = 'No recommendations found'
+    MSG_NO_RECOMMENDATIONS = 'No recommendations available yet'
     MSG_NO_SEARCH_RESULTS = 'No search results found'
     MSG_ERROR_SEARCH_RESULTS = 'Can\'t find these search results'
     MSG_NO_VOCABULARY = 'Can\'t find vocabulary for this song'
     MSG_ERROR_RECORD_RECOMMENDATIONS = 'Can\'t update recommendations based on this action'
-    MSG_NO_RECOMMENDATIONS_AVAILABLE = 'No recommendations available yet'
     MSG_TARGETED_RECOMMENDATIONS_NOT_AVAILABLE = 'For some language difficulties, no recommendations are available'
     MSG_ERROR = 'Something went wrong'
     MSG_COOKIE = 'Couldn\'t load search history'
@@ -41,16 +40,12 @@ module LyricLab
 
       # cookies
       session[:search_history] ||= []
-      session[:lang_difficulty] ||= ''
 
       # GET /
       routing.root do
         first_time = session[:first_visit].nil?
+        session[:lang_difficulty] = routing.params['language_level'] if session[:lang_difficulty].nil?
         session[:first_visit] = false
-
-        # current_level = session['language_level'] || 'beginner'
-
-        session[:lang_difficulty] = routing.params['language_level'] unless first_time
 
         # check cookies size
         session_size = session[:search_history].to_json.bytesize
@@ -58,54 +53,39 @@ module LyricLab
 
         viewable_search_history = Service::LoadSongsById.new.call(session[:search_history])
         viewable_search_history = if viewable_search_history.failure?
-                                    # flash[:error] = MSG_COOKIE no need to show error
                                     []
                                   else
                                     Views::SongsList.new(viewable_search_history.value!.songs)
                                   end
 
-        # TODO: get recommendations for each language_level from the API
-        language_difficulties = [1,3,4,5,7]
-        # this is gonna be a list of song metadata lists
-        view_recommendations_by_difficulty = []
-        language_difficulties.each do |language_difficulty|
-          view_recommendations_by_difficulty.append(Service::ListTargetedRecommendations.new.call(language_difficulty))
-          if view_recommendations_by_difficulty.last.failure?
-            flash.now[:error] = MSG_NO_RECOMMENDATIONS
-            view_recommendations_by_difficulty.last = []
+        language_difficulties = [1, 3, 4, 5, 7]
+        # returns list of song metadata
+        view_recommendations_by_difficulty = language_difficulties.map do |language_difficulty|
+          # TODO why make seperate calls to API
+          result = Service::ListTargetedRecommendations.new.call(language_difficulty)
+          if result.failure?
+            []
           else
-            view_recommendations_by_difficulty[-1] = view_recommendations_by_difficulty.last.value!.recommendations
-            flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if view_recommendations_by_difficulty.last.none?
-            view_recommendations_by_difficulty[-1] = Views::SongsList.new(view_recommendations_by_difficulty.last)
+            recommendations = result.value!.recommendations
+            Views::SongsList.new(recommendations)
           end
         end
 
-        current_level = session[:lang_difficulty] || 'beginner'
-        
-        
-        view 'home',
-             locals: { 
-              recommendations_by_difficulty: view_recommendations_by_difficulty, 
-              song_history: viewable_search_history, 
-              first_time:first_time,
-              current_level: current_level }
-
+        view 'home', locals: { recommendations_by_difficulty: view_recommendations_by_difficulty,
+                               song_history: viewable_search_history,
+                               first_time:,
+                               current_level: session[:lang_difficulty] }
       rescue StandardError => e
         App.logger.error(e)
         flash[:error] = MSG_ERROR
         routing.redirect '/'
       end
 
-      routing.on 'update_language_level' do
-        routing.post do
-          request_payload = JSON.parse(routing.body.read)
-          session[:lang_difficulty] = request_payload['language_level']
-          
-          response.status = 200
-          { status: 'success',
-           language_level: session[:lang_difficulty],
-          redirect_url:'/' }.to_json
-        end
+      # handle dropdown menu selection
+      routing.post 'set_language_level' do
+        data = JSON.parse(routing.body.read)
+        session[:lang_difficulty] = data['language_level']
+        routing.halt 200, { message: 'Language level updated' }.to_json
       end
 
       routing.on 'search' do # rubocop:disable Metrics/BlockLength
@@ -115,7 +95,7 @@ module LyricLab
             response.expires 60, public: true
             search_string = Forms::NewSearch.new.call(routing.params)
             search_results = Service::FindSongsFromSearch.new.call(search_string)
-            
+
             raise search_results.failure if search_results.failure?
 
             songs = search_results.value!.songs
@@ -158,7 +138,7 @@ module LyricLab
             result = Service::LoadVocabulary.new.call(
               origin_id: origin_id
             )
-            
+
             if result.failure?
               flash[:error] = result.failure
               raise result.failure
@@ -176,9 +156,9 @@ module LyricLab
               session[:search_history] << vocabulary_song.origin_id
             end
 
-            current_lang_level = session[:lang_difficulty]
-            viewable_vocabulary = Views::Vocabulary.new(vocabulary_song, current_lang_level)
-            viewable_song = Views::Song.new(vocabulary_song)
+            # TODO: why do we have two views if song initializes vocabulary, we never use viewable_vocabulary
+            # viewable_vocabulary = Views::Vocabulary.new(vocabulary_song, session[:lang_difficulty])
+            viewable_song = Views::Song.new(vocabulary_song, session[:lang_difficulty])
 
             # Only use browser caching in production
             App.configure :production do
@@ -186,10 +166,11 @@ module LyricLab
             end
 
             # Show viewer the song
-            view 'song', locals: { 
-              vocabulary: viewable_vocabulary,  
-              song: viewable_song,          
-              current_lang_level: current_lang_level || 'beginner' }
+            view 'song', locals: {
+              # vocabulary: viewable_vocabulary,
+              song: viewable_song,
+              current_lang_level: session[:lang_difficulty]
+            }
           rescue StandardError => e
             App.logger.error(e)
             flash[:error] = MSG_NO_VOCABULARY

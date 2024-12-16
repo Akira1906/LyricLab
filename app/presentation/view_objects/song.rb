@@ -3,12 +3,13 @@
 module Views
   # View for a a list of project entities
   class Song
-    def initialize(song)
+    def initialize(song, current_lang_level)
       @song = song
+      @current_lang_level = current_lang_level
     end
 
     def vocabulary
-      Views::Vocabulary.new(@song.vocabulary)
+      Views::Vocabulary.new(@song.vocabulary, @current_lang_level)
     end
 
     def title

@@ -1,13 +1,6 @@
 .container-fluid.py-4
   .card.border-0.shadow-sm.mb-4
     .card-body.p-5
-      / Debug information
-      / .debug-info.small.text-muted.mb-3
-      /   | Preview URL: #{song.preview_url.inspect}
-      /   br
-      /   | Preview URL defined?: #{defined?(song.preview_url)}
-      /   br
-      /   | Song methods: #{song.methods.include?(:preview_url)}
 
       .row.justify-content-center
         .col-lg-10
@@ -36,8 +29,6 @@
                 div.mb-3
                   .text-uppercase.text-muted.small.mb-1 
                     | Language Level 
-                    / span.ms-2.badge style="background-color: #{song.vocabulary.difficulty_color}"
-                    /   = song.vocabulary.difficulty_text
                   .h5.mb-0.d-flex.align-items-center
                     - level = song.vocabulary.language_difficulty
                     - 5.times do |i|
