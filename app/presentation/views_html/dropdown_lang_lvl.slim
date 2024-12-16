@@ -14,25 +14,21 @@
           a.dropdown-item href="#" onclick="updateLanguageLevel('expert')" Expert
         li
           a.dropdown-item href="#" onclick="updateLanguageLevel('master')" Master
-script
-  | document.addEventListener('DOMContentLoaded', () => {
-  |   const updateLanguageLevel = (level) => {
-  |     fetch('/update_language_level', {
-  |       method: 'POST',
-  |       headers: {
-  |         'Content-Type': 'application/json',
-  |       },
-  |       body: JSON.stringify({ language_level: level }),
-  |     })
-  |     .then(response => {
-  |       if (!response.ok) {
-  |         console.error('Failed to update language level');
-  |       }
-  |       return response.json();
-  |     })
-  |     .then(data => {
-  |       console.log('Language level updated:', data);
-  |     })
-  |     .catch(error => console.error('Error:', error));
-  |   };
-  | });
+javascript:
+  function updateLanguageLevel(level) {
+    fetch('/update_language_level', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ language_level: level })
+    })
+    .then(response => response.json())
+    .then(data => {
+      // 觸發自定義事件
+      window.dispatchEvent(new CustomEvent('languageLevelChanged', {
+        detail: { level: level }
+      }));
+    })
+    .catch(error => console.error('Error:', error));
+  }

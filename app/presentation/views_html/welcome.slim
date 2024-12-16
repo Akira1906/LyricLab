@@ -21,3 +21,37 @@
       .modal-footer.border-0.pt-2
         button#start-learning.btn.btn-success.btn-lg.px-5.py-2 style="border-radius: 50px;" type="button"
           | Let's start learning
+javascript:
+  document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('language-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const level = document.getElementById('proficiency-level').value;
+      
+      try {
+        const response = await fetch('/update_language_level', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ language_level: level })
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('Response:', data); // 用於調試
+          
+          // 隱藏 modal
+          const modal = bootstrap.Modal.getInstance(document.getElementById('languageModal'));
+          if (modal) {
+            modal.hide();
+          }
+          
+          // 強制刷新頁面以確保更新
+          window.location.href = data.redirect_url || '/';
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    });
+  });
