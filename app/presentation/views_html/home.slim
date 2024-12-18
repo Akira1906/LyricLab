@@ -65,8 +65,9 @@
                     thead
                       tr
                         th style="width: 80px;"
-                        th style="width: 250px;" Title
-                        th style="width: 250px;" Artist
+                        th style="width: 80px;" Cover
+                        th style="width: 30%;" Title
+                        th style="width: 30%;" Artist
                     tbody
                       - recommendations_by_difficulty[difficulty_mapping[level]].each do |song|
                         tr
@@ -74,6 +75,8 @@
                             a href=song.result_link
                               button.recommendation-button
                                 i class="fa-regular fa-eye"
+                          td style="width: 80px;"
+                            img src=song.cover_image_url_small alt="Album cover image" style="width: 30px; height: 30px;"
                           td.font-weight-bold= song.title
                           td.font-weight-bold= song.artist
 
