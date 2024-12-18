@@ -23,7 +23,7 @@ javascript:
         event.preventDefault(); // Prevent the default link behavior
         const selectedLevel = event.target.getAttribute('data-value');
 
-        fetch('/set_language_level', {
+        fetch('/update_language_level', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
