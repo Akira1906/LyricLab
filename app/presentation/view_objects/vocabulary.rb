@@ -71,9 +71,9 @@ module Views
 
       case @vocabulary.language_difficulty
       when 0..1.5 then 1    # Beginner
-      when 1.5..3.5 then 2  # Intermediate
-      when 3.6..5.0 then 3  # Advanced
-      when 5.1..6.0 then 4  # Expert
+      when 1.5..2.5 then 2  # Intermediate
+      when 2.5..3.5 then 3  # Advanced
+      when 3.5..4.5 then 4  # Expert
       else 5                # Master
       end
     end

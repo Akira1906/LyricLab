@@ -58,10 +58,7 @@ module LyricLab
                                   else
                                     Views::SongsList.new(viewable_search_history.value!.songs)
                                   end
-
-        # TODO: get recommendations for each language_level from the API
-        language_difficulties = [1, 3, 4, 5, 7]
-        # this is gonna be a list of song metadata lists
+        language_difficulties = [1, 2, 3, 4, 5]
         view_recommendations_by_difficulty = []
         language_difficulties.each do |language_difficulty|
           view_recommendations_by_difficulty.append(Service::ListTargetedRecommendations.new.call(language_difficulty))
@@ -168,6 +165,7 @@ module LyricLab
             vocabulary_song = vocabulary_song.vocabulary_song
             unless session[:search_history].include?(vocabulary_song.origin_id)
               session[:search_history] << vocabulary_song.origin_id
+              puts "Search history: #{session[:search_history]}"
             end
 
             # TODO: why do we have two views if song initializes vocabulary, we never use viewable_vocabulary
