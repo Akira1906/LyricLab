@@ -69,6 +69,17 @@ module LyricLab
             view_recommendations_by_difficulty[-1] = view_recommendations_by_difficulty.last.value!.recommendations
             flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if view_recommendations_by_difficulty.last.none?
             view_recommendations_by_difficulty[-1] = Views::SongsList.new(view_recommendations_by_difficulty.last)
+
+        # TODO: get recommendations for each language_level from the API
+        language_difficulties = [1, 3, 4, 5, 7]
+        view_recommendations_by_difficulty = language_difficulties.map do |language_difficulty|
+          # TODO why make seperate calls to API
+          result = Service::ListTargetedRecommendations.new.call(language_difficulty)
+          if result.failure?
+            []
+          else
+            recommendations = result.value!.recommendations
+            Views::SongsList.new(recommendations)
           end
         end
 
@@ -142,9 +153,6 @@ module LyricLab
         # GET /result/{spotify_id}
         routing.on 'result', String do |origin_id|
           routing.get do
-            record_result = Service::RecordRecommendation.new.call(origin_id)
-            # The system should still work if the recording fails
-            flash.now[:error] = MSG_ERROR_RECORD_RECOMMENDATIONS if record_result.failure?
 
             result = Service::LoadVocabulary.new.call(
               origin_id: origin_id
@@ -156,21 +164,29 @@ module LyricLab
             end
 
             vocabulary_song = OpenStruct.new(result.value!)
-            if vocabulary_song.response.processing?
-              flash[:notice] = 'Vocabulary Information for the song is being generated, ' \
-                               'please check back in a moment(~1 min).'
-              routing.redirect request.referer || '/'
+            response = result.value![:response]
+
+            unless vocabulary_song.response.processing?
+              generated_vocabulary = vocabulary_song.vocabulary_song
+              viewable_song = Views::Song.new(generated_vocabulary, session[:lang_difficulty])
+
+              unless session[:search_history].include?(generated_vocabulary.origin_id)
+                session[:search_history] << generated_vocabulary.origin_id
+              end
+
+              record_result = Service::RecordRecommendation.new.call(origin_id)
+              # The system should still work if the recording fails
+              flash.now[:error] = MSG_ERROR_RECORD_RECOMMENDATIONS if record_result.failure?
+
+              # Only use browser caching in production
+              App.configure :production do
+                response.expires 60, public: true
+              end
             end
 
-            vocabulary_song = vocabulary_song.vocabulary_song
-            unless session[:search_history].include?(vocabulary_song.origin_id)
-              session[:search_history] << vocabulary_song.origin_id
-              puts "Search history: #{session[:search_history]}"
-            end
-
-            # TODO: why do we have two views if song initializes vocabulary, we never use viewable_vocabulary
-            # viewable_vocabulary = Views::Vocabulary.new(vocabulary_song, session[:lang_difficulty])
-            viewable_song = Views::Song.new(vocabulary_song, session[:lang_difficulty])
+            processing = Views::VocabularyProcessing.new(
+              App.config, vocabulary_song.response
+            )
 
             # Only use browser caching in production
             App.configure :production do
@@ -179,7 +195,7 @@ module LyricLab
 
             # Show viewer the song
             view 'song', locals: {
-              # vocabulary: viewable_vocabulary,
+              processing: processing,
               song: viewable_song,
               current_lang_level: session[:lang_difficulty]
             }

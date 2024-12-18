@@ -3,7 +3,6 @@
 require_relative 'record'
 
 module Views
-  # View for a a list of project entities
   class SongsList
     def initialize(recommendations)
       @recommendations = recommendations.map do |rec|

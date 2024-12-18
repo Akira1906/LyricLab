@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Views
-  # View for a a list of project entities
   class Word
     def initialize(word)
       @word = word
