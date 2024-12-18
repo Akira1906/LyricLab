@@ -4,15 +4,7 @@ require_relative 'word'
 require 'slim'
 
 module Views
-  # View for a a list of project entities
   class Vocabulary
-    # DIFFICULTY_LEVELS = {
-    #  1 => 'Beginner',
-    #  2 => 'Intermediate',
-    #  3 => 'Advanced',
-    #  4 => 'Expert',
-    #  5 => 'Master'
-    # }.freeze
 
     LANG_TO_VOCAB_LEVELS = {
       'beginner'     => %w[beginner novice1 novice2],
@@ -62,10 +54,6 @@ module Views
       marked_text
     end
 
-    # def entity
-    #  @vocabulary
-    # end
-
     def language_difficulty
       return 0 if @vocabulary.language_difficulty.nil?
 
@@ -77,10 +65,6 @@ module Views
       else 5                # Master
       end
     end
-
-    # def default_checked_levels
-    #  DEFAULT_CHECKED_LEVELS[language_difficulty] || []
-    # end
 
     def level_checked?(level)
       levels = LANG_TO_VOCAB_LEVELS[@current_lang_level]

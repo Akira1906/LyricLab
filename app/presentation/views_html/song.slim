@@ -1,53 +1,73 @@
-.container-fluid.py-4
-  .card.border-0.shadow-sm.mb-4
-    .card-body.p-5
+.container
+  - if processing.in_progress?
+    .progress
+      .progress-bar.bg-success.progress-bar-striped.active[role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width:0%"]
+    script src="#{processing.ws_javascript}"
+    javascript:
+      const channel = "#{processing.ws_channel_id}";
+      const client = new Faye.Client("#{processing.ws_route}");
+      const progressBar = document.querySelector(".progress-bar");
+      const progressRegex = /:(\d+)%/;
 
-      .row.justify-content-center
-        .col-lg-10
-          .d-flex.flex-wrap.align-items-start.justify-content-center.gap-5
-          
-            div style="width: 350px;"
-              .cover-container.mb-3
-                img.img-fluid.rounded-3.w-100 src="#{song.cover_image_url_medium}" alt="Album Cover" style="object-fit: cover;"            
-            
-            .song-info-container.pt-2 style="width: 350px;"
-              h2.display-4.mb-3
-                = song.title
-              h3.text-muted.mb-4 style="font-size: 1.75rem; font-weight: 400;"
-                = song.artist_name_string
-              .song-details
-                .d-flex.align-items-center.mb-3
-                  .me-5
-                    .text-uppercase.text-muted.small.mb-1 Album
-                    .h5.mb-0 = song.album_name
-                  div
-                    .text-uppercase.text-muted.small.mb-1 Popularity
-                    .h5.mb-0.d-flex.align-items-center
-                      i.fas.fa-fire.text-warning.me-2
-                      = "#{song.popularity}/100"
+      client.subscribe(`/${channel}`, (message) => {
+        const progressStyle = progressBar.getAttribute("style");
+        const currentProgress = progressRegex.exec(progressStyle)?.[1] || 0;
+        console.log(`Message from worker: ${message}`);
 
-                div.mb-3
-                  .text-uppercase.text-muted.small.mb-1 
-                    | Language Level 
-                  .h5.mb-0.d-flex.align-items-center
-                    - level = song.vocabulary.language_difficulty
-                    - 5.times do |i|
-                      - if i < level
-                        i.fas.fa-star.text-warning.me-1
-                      - else
-                        i.fas.fa-star.text-gray-300.me-1
+        if (isNaN(message)) {
+          progressBar.setAttribute("style", "width:100%");
+          progressBar.setAttribute("class", "progress-bar bg-danger progress-bar-striped");
+          progressBar.textContent = message;
+        } else if (parseInt(message) > parseInt(currentProgress)) {
+          progressBar.setAttribute("aria-valuenow", message);
+          progressBar.setAttribute("style", `width:${message}%`);
+          progressBar.textContent = `${message}%`;
 
-                div.mt-3
-                  - if song.origin_id
-                    a.btn.d-inline-flex.align-items-center.w-100.justify-content-center href="https://open.spotify.com/track/#{song.origin_id}" target="_blank" style="background-color: #1DB954; color: white; border-radius: 500px; padding: 7px 15px; font-size: 14px; text-decoration: none; transition: all 0.2s ease;"
-                      i.fab.fa-spotify style="font-size: 16px; margin-right: 6px;"
-                      span Listen on Spotify
-
-  .row
-    .col-md-7
-      .card.border-0.shadow-sm
-        .card-body.p-4
-          == song.vocabulary.rich_text
-    
-    .col-md-5
-      #vocabulary-details.sticky-top style="top: 20px; max-height: calc(100vh - 40px); overflow-y: auto;"
+          if (message === "100") {
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+          }
+        }
+      });
+  - else
+    .container-fluid.py-4
+      .card.border-0.shadow-sm.mb-4
+        .card-body.p-5
+          .row.justify-content-center
+            .col-lg-10
+              .d-flex.flex-wrap.align-items-start.justify-content-center.gap-5
+                div[style="width: 350px;"]
+                  .cover-container.mb-3
+                    img.img-fluid.rounded-3.w-100[src="#{song.cover_image_url_medium}" alt="Album Cover" style="object-fit: cover;"]
+                .song-info-container.pt-2[style="width: 350px;"]
+                  h2.display-4.mb-3= song.title
+                  h3.text-muted.mb-4[style="font-size: 1.75rem; font-weight: 400;"]= song.artist_name_string
+                  .song-details
+                    .d-flex.align-items-center.mb-3
+                      .me-5
+                        .text-uppercase.text-muted.small.mb-1 Album
+                        .h5.mb-0= song.album_name
+                      div
+                        .text-uppercase.text-muted.small.mb-1 Popularity
+                        .h5.mb-0.d-flex.align-items-center
+                          i.fas.fa-fire.text-warning.me-2
+                          = "#{song.popularity}/100"
+                    div.mb-3
+                      .text-uppercase.text-muted.small.mb-1 Language Level
+                      .h5.mb-0.d-flex.align-items-center
+                        - level = song.vocabulary.language_difficulty
+                        - 5.times do |i|
+                          i class=(i < level ? "fas fa-star text-warning me-1" : "fas fa-star text-gray-300 me-1")
+                    div.mt-3
+                      - if song.origin_id
+                        a.btn.d-inline-flex.align-items-center.w-100.justify-content-center[href="https://open.spotify.com/track/#{song.origin_id}" target="_blank" style="background-color: #1DB954; color: white; border-radius: 500px; padding: 7px 15px; font-size: 14px; text-decoration: none; transition: all 0.2s ease;"]
+                          i.fab.fa-spotify[style="font-size: 16px; margin-right: 6px;"]
+                          span Listen on Spotify
+      .row
+        .col-md-7
+          .card.border-0.shadow-sm
+            .card-body.p-4
+              == song.vocabulary.rich_text
+        .col-md-5
+          #vocabulary-details.sticky-top[style="top: 20px; max-height: calc(100vh - 40px); overflow-y: auto;"]
