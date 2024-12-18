@@ -1,35 +1,36 @@
 .container
   - if processing.in_progress?
-    .progress
-      .progress-bar.bg-success.progress-bar-striped.active[role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width:0%"]
-    script src="#{processing.ws_javascript}"
-    javascript:
-      const channel = "#{processing.ws_channel_id}";
-      const client = new Faye.Client("#{processing.ws_route}");
-      const progressBar = document.querySelector(".progress-bar");
-      const progressRegex = /:(\d+)%/;
+    .container.d-flex.align-items-center.justify-content-center[style="height: 50vh;"]
+      .progress[style="width: 80%; height: 50px;"]
+        .progress-bar.bg-success.progress-bar-striped.active[role="progressbar" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100" style="width:0%"]
+      script src="#{processing.ws_javascript}"
+      javascript:
+        const channel = "#{processing.ws_channel_id}";
+        const client = new Faye.Client("#{processing.ws_route}");
+        const progressBar = document.querySelector(".progress-bar");
+        const progressRegex = /:(\d+)%/;
 
-      client.subscribe(`/${channel}`, (message) => {
-        const progressStyle = progressBar.getAttribute("style");
-        const currentProgress = progressRegex.exec(progressStyle)?.[1] || 0;
-        console.log(`Message from worker: ${message}`);
+        client.subscribe(`/${channel}`, (message) => {
+          const progressStyle = progressBar.getAttribute("style");
+          const currentProgress = progressRegex.exec(progressStyle)?.[1] || 0;
+          console.log(`Message from worker: ${message}`);
 
-        if (isNaN(message)) {
-          progressBar.setAttribute("style", "width:100%");
-          progressBar.setAttribute("class", "progress-bar bg-danger progress-bar-striped");
-          progressBar.textContent = message;
-        } else if (parseInt(message) > parseInt(currentProgress)) {
-          progressBar.setAttribute("aria-valuenow", message);
-          progressBar.setAttribute("style", `width:${message}%`);
-          progressBar.textContent = `${message}%`;
+          if (isNaN(message)) {
+            progressBar.setAttribute("style", "width:100%");
+            progressBar.setAttribute("class", "progress-bar bg-danger progress-bar-striped");
+            progressBar.textContent = message;
+          } else if (parseInt(message) > parseInt(currentProgress)) {
+            progressBar.setAttribute("aria-valuenow", message);
+            progressBar.setAttribute("style", `width:${message}%`);
+            progressBar.textContent = `${message}%`;
 
-          if (message === "100") {
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
+            if (message === "100") {
+              setTimeout(() => {
+                window.location.reload();
+              }, 1000);
+            }
           }
-        }
-      });
+        });
   - else
     .container-fluid.py-4
       .card.border-0.shadow-sm.mb-4

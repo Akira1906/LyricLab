@@ -149,7 +149,6 @@ module LyricLab
             end
 
             vocabulary_song = OpenStruct.new(result.value!)
-            response = result.value![:response]
 
             unless vocabulary_song.response.processing?
               generated_vocabulary = vocabulary_song.vocabulary_song
