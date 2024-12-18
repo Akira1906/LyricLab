@@ -6,20 +6,20 @@ require 'slim'
 module Views
   # View for a a list of project entities
   class Vocabulary
-    DIFFICULTY_LEVELS = {
-      1 => 'Beginner',
-      2 => 'Intermediate',
-      3 => 'Advanced',
-      4 => 'Expert',
-      5 => 'Master'
-    }.freeze
+    # DIFFICULTY_LEVELS = {
+    #  1 => 'Beginner',
+    #  2 => 'Intermediate',
+    #  3 => 'Advanced',
+    #  4 => 'Expert',
+    #  5 => 'Master'
+    # }.freeze
 
     LANG_TO_VOCAB_LEVELS = {
-      'beginner' => %w[beginner novice1 novice2],
+      'beginner'     => %w[beginner novice1 novice2],
       'intermediate' => %w[novice2 level1 level2],
-      'advanced' => %w[level2 level3 level4],
-      'expert' => %w[level3 level4 level5],
-      'master' => %w[level4 level5]                       
+      'advanced'     => %w[level2 level3 level4],
+      'expert'       => %w[level3 level4 level5],
+      'master'       => %w[level4 level5]
     }.freeze
 
     attr_reader :current_lang_level
@@ -27,8 +27,6 @@ module Views
     def initialize(vocabulary, current_lang_level = nil)
       @vocabulary = vocabulary
       @current_lang_level = current_lang_level
-      
-      # @current_lang_level = 'beginner' unless LANG_TO_VOCAB_LEVELS.key?(@current_lang_level)
     end
 
     def sep_text
@@ -61,13 +59,12 @@ module Views
       unique_words.map(&:characters).sort_by(&:length).reverse.each do |word|
         marked_text.gsub!(word, "\\@#{word}\\$")
       end
-      # puts "text: #{marked_text}"
       marked_text
     end
 
-    def entity
-      @vocabulary
-    end
+    # def entity
+    #  @vocabulary
+    # end
 
     def language_difficulty
       return 0 if @vocabulary.language_difficulty.nil?
@@ -81,16 +78,13 @@ module Views
       end
     end
 
-    def default_checked_levels
-      DEFAULT_CHECKED_LEVELS[language_difficulty] || []
-    end
+    # def default_checked_levels
+    #  DEFAULT_CHECKED_LEVELS[language_difficulty] || []
+    # end
 
     def level_checked?(level)
-      return false unless level && @current_lang_level
-
       levels = LANG_TO_VOCAB_LEVELS[@current_lang_level]
-      return false unless levels
-      levels&.include?(level.to_s) 
+      levels&.include?(level.to_s)
     end
   end
 end

@@ -24,7 +24,7 @@ module LyricLab
     MAX_SESSION_SIZE = 4096 # to control for cookies size
 
     # Flash messages
-    MSG_NO_RECOMMENDATIONS = 'No recommendations found'
+    MSG_NO_RECOMMENDATIONS = 'No recommendations available yet'
     MSG_NO_SEARCH_RESULTS = 'No search results found'
     MSG_ERROR_SEARCH_RESULTS = 'Can\'t find these search results'
     MSG_NO_VOCABULARY = 'Can\'t find vocabulary for this song'
@@ -41,16 +41,12 @@ module LyricLab
 
       # cookies
       session[:search_history] ||= []
-      session[:lang_difficulty] ||= ''
 
       # GET /
       routing.root do
         first_time = session[:first_visit].nil?
+        session[:lang_difficulty] = routing.params['language_level'] if session[:lang_difficulty].nil?
         session[:first_visit] = false
-
-        # current_level = session['language_level'] || 'beginner'
-
-        session[:lang_difficulty] = routing.params['language_level'] unless first_time
 
         # check cookies size
         session_size = session[:search_history].to_json.bytesize
@@ -58,7 +54,6 @@ module LyricLab
 
         viewable_search_history = Service::LoadSongsById.new.call(session[:search_history])
         viewable_search_history = if viewable_search_history.failure?
-                                    # flash[:error] = MSG_COOKIE no need to show error
                                     []
                                   else
                                     Views::SongsList.new(viewable_search_history.value!.songs)
@@ -175,9 +170,9 @@ module LyricLab
               session[:search_history] << vocabulary_song.origin_id
             end
 
-            current_lang_level = session[:lang_difficulty]
-            viewable_vocabulary = Views::Vocabulary.new(vocabulary_song, current_lang_level)
-            viewable_song = Views::Song.new(vocabulary_song)
+            # TODO: why do we have two views if song initializes vocabulary, we never use viewable_vocabulary
+            # viewable_vocabulary = Views::Vocabulary.new(vocabulary_song, session[:lang_difficulty])
+            viewable_song = Views::Song.new(vocabulary_song, session[:lang_difficulty])
 
             # Only use browser caching in production
             App.configure :production do
@@ -186,9 +181,9 @@ module LyricLab
 
             # Show viewer the song
             view 'song', locals: {
-              vocabulary: viewable_vocabulary,
+              # vocabulary: viewable_vocabulary,
               song: viewable_song,
-              current_lang_level: current_lang_level || 'beginner'
+              current_lang_level: session[:lang_difficulty]
             }
           rescue StandardError => e
             App.logger.error(e)

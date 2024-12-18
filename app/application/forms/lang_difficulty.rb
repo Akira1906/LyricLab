@@ -7,7 +7,7 @@ module LyricLab
     # Form validation for search query
     class LangDifficulty < Dry::Validation::Contract
       # check for non empty search string
-      LANG_DIFF_OPTIONS = ['', 'beginner', 'intermediate', 'advanced', 'expert', 'master']
+      LANG_DIFF_OPTIONS = ['', 'beginner', 'intermediate', 'advanced', 'expert', 'master'].freeze
       MSG_NO_LANG_DIFF = 'no language difficulty selected'
 
       params do
