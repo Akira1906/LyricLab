@@ -59,21 +59,7 @@ module LyricLab
                                     Views::SongsList.new(viewable_search_history.value!.songs)
                                   end
         language_difficulties = [1, 2, 3, 4, 5]
-        view_recommendations_by_difficulty = []
-        language_difficulties.each do |language_difficulty|
-          view_recommendations_by_difficulty.append(Service::ListTargetedRecommendations.new.call(language_difficulty))
-          if view_recommendations_by_difficulty.last.failure?
-            flash.now[:error] = MSG_NO_RECOMMENDATIONS
-            view_recommendations_by_difficulty.last = []
-          else
-            view_recommendations_by_difficulty[-1] = view_recommendations_by_difficulty.last.value!.recommendations
-            flash.now[:notice] = MSG_NO_RECOMMENDATIONS_AVAILABLE if view_recommendations_by_difficulty.last.none?
-            view_recommendations_by_difficulty[-1] = Views::SongsList.new(view_recommendations_by_difficulty.last)
-
-        # TODO: get recommendations for each language_level from the API
-        language_difficulties = [1, 3, 4, 5, 7]
         view_recommendations_by_difficulty = language_difficulties.map do |language_difficulty|
-          # TODO why make seperate calls to API
           result = Service::ListTargetedRecommendations.new.call(language_difficulty)
           if result.failure?
             []
@@ -153,7 +139,6 @@ module LyricLab
         # GET /result/{spotify_id}
         routing.on 'result', String do |origin_id|
           routing.get do
-
             result = Service::LoadVocabulary.new.call(
               origin_id: origin_id
             )
