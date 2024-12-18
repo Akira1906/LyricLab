@@ -100,7 +100,9 @@ module LyricLab
         routing.is do
           # POST /search/
           routing.post do
-            response.expires 60, public: true
+            App.configure :production do
+              response.expires 60, public: true
+            end
             search_string = Forms::NewSearch.new.call(routing.params)
             search_results = Service::FindSongsFromSearch.new.call(search_string)
 
@@ -149,7 +151,7 @@ module LyricLab
             end
 
             vocabulary_song = OpenStruct.new(result.value!)
-            response = result.value![:response]
+            # response = result.value![:response]
 
             unless vocabulary_song.response.processing?
               generated_vocabulary = vocabulary_song.vocabulary_song
@@ -163,10 +165,6 @@ module LyricLab
               # The system should still work if the recording fails
               flash.now[:error] = MSG_ERROR_RECORD_RECOMMENDATIONS if record_result.failure?
 
-              # Only use browser caching in production
-              App.configure :production do
-                response.expires 60, public: true
-              end
             end
 
             processing = Views::VocabularyProcessing.new(
