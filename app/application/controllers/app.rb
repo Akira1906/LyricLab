@@ -103,9 +103,6 @@ module LyricLab
             App.configure :production do
               response.expires 60, public: true
             end
-            App.configure :production do
-              response.expires 60, public: true
-            end
             search_string = Forms::NewSearch.new.call(routing.params)
             search_results = Service::FindSongsFromSearch.new.call(search_string)
 
