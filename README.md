@@ -3,7 +3,7 @@
 ## LyricLab
 A web service designed to help language learners expand their Mandarin vocabulary through Taiwanese songs. LyricLab's goal is to make learning more convenient and enjoyable.
 
-Please also note the Web API that it uses: [https://github.com/SECutiee/ScanChat-api](https://github.com/Akira1906/LyricLab-API)
+Please also note the Web API that it uses: [https://github.com/Akira1906/LyricLab-API](https://github.com/Akira1906/LyricLab-API)
 
 ## Project Overview
 LyricLab involves the design and implementation of a database for managing songs, lyrics, vocabulary, and recommendations with related attributes. The database is created and managed using Sequel, a Ruby toolkit for interacting with SQL databases. LyricLab pulls song information (title, artist, popularity, etc.) as well as lyrics from the Spotify and LrcLib APIs. Users can select one of the language levels and search for a song, generating a vocabulary list based on the selected level and the lyrics of the specified song. Users can then select specific words to see more learning information such as translations, pinyin, and example sentences.
